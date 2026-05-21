@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: App checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.3
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  deploy:
+    name: Deploy production
+    needs: app
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    environment:
+      name: production
+      url: ${{ vars.BLIISH_BASE_URL }}
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install SSH key
+        env:
+          BLIISH_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.BLIISH_DEPLOY_SSH_PRIVATE_KEY }}
+          BLIISH_DEPLOY_KNOWN_HOSTS: ${{ secrets.BLIISH_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$BLIISH_DEPLOY_SSH_PRIVATE_KEY" ]; then
+            echo "Missing BLIISH_DEPLOY_SSH_PRIVATE_KEY" >&2
+            exit 1
+          fi
+          if [ -z "$BLIISH_DEPLOY_KNOWN_HOSTS" ]; then
+            echo "Missing BLIISH_DEPLOY_KNOWN_HOSTS" >&2
+            exit 1
+          fi
+          install -d -m 0700 ~/.ssh
+          printf '%s\n' "$BLIISH_DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
+          printf '%s\n' "$BLIISH_DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy over SSH
+        env:
+          BLIISH_SSH_USER: ${{ vars.BLIISH_SSH_USER || 'root' }}
+          BLIISH_SSH_HOST: ${{ vars.BLIISH_SSH_HOST }}
+          BLIISH_REPOSITORY_REF: ${{ vars.BLIISH_REPOSITORY_REF || 'main' }}
+        run: |
+          if [ -z "$BLIISH_SSH_HOST" ]; then
+            echo "Missing BLIISH_SSH_HOST production variable" >&2
+            exit 1
+          fi
+          export BLIISH_DEPLOY_SSH_KEY="$HOME/.ssh/id_ed25519"
+          deploy/hetzner/update.sh

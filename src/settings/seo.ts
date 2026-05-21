@@ -1,0 +1,134 @@
+import { sourceProject } from "../project.js";
+import { truncateText } from "../text.js";
+import { headerChromeColor, type ColorPalette } from "../theme/colorPalette.js";
+import type { SiteSettings } from "./site.js";
+
+export const defaultSocialImagePath = "/og-image.png";
+export const socialImageSize = {
+  width: 1200,
+  height: 630
+} as const;
+
+export type JsonLd = Record<string, unknown>;
+
+export type PageSeo = {
+  canonicalPath?: string;
+  description?: string;
+  imageAlt?: string;
+  imagePath?: string;
+  jsonLd?: JsonLd | JsonLd[];
+  modifiedTime?: string;
+  noindex?: boolean;
+  publishedTime?: string;
+  title?: string;
+  type?: "article" | "profile" | "website";
+};
+
+export function siteSeoDescription(settings: SiteSettings) {
+  return seoText(settings.home.welcomeText || siteMarketingDescription(settings), 180);
+}
+
+export function siteMarketingDescription(settings: Pick<SiteSettings, "identity">) {
+  const name = settings.identity.name.trim() || sourceProject.name;
+  return `${name} is an ultra-fast, lightweight, open-source social platform with customizable profiles, no ads, no tracking, and simple, affordable self-hosting.`;
+}
+
+export function seoText(input: string, maxLength = 180) {
+  return truncateText(input.replace(/\s+/g, " ").trim(), maxLength);
+}
+
+export function siteSocialImageAlt(settings: SiteSettings) {
+  return `${settings.identity.name} social preview`;
+}
+
+export function siteStructuredData(settings: SiteSettings, siteUrl: string, imageUrl: string): JsonLd[] {
+  const organization = organizationStructuredData(settings, siteUrl);
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: settings.identity.name,
+      description: siteSeoDescription(settings),
+      url: siteUrl,
+      image: imageUrl,
+      ...(organization ? { publisher: { "@id": organization["@id"] } } : {})
+    },
+    ...(organization ? [organization] : [])
+  ];
+}
+
+export function siteWebManifest(settings: SiteSettings, palette: ColorPalette) {
+  return JSON.stringify(
+    {
+      name: settings.identity.name,
+      short_name: truncateText(settings.identity.name, 24),
+      description: siteSeoDescription(settings),
+      start_url: "/",
+      scope: "/",
+      display: "standalone",
+      background_color: palette.page,
+      theme_color: headerChromeColor(palette),
+      icons: [
+        { src: "/favicon.svg", sizes: "any", type: "image/svg+xml" },
+        { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+        { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
+        { src: "/icon-1024.png", sizes: "1024x1024", type: "image/png" }
+      ]
+    },
+    null,
+    2
+  );
+}
+
+export function siteSocialPreviewSvg(settings: SiteSettings, palette: ColorPalette) {
+  const background = headerChromeColor(palette);
+  const foreground = palette.chromeText;
+  const name = seoText(settings.identity.name || sourceProject.name, 58);
+  const tagline = seoText(settings.identity.tagline || siteSeoDescription(settings), 86);
+  const nameSize = fittedFontSize(name, 74, 48, 24);
+  const taglineSize = fittedFontSize(tagline, 42, 30, 38);
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${socialImageSize.width}" height="${socialImageSize.height}" viewBox="0 0 ${socialImageSize.width} ${socialImageSize.height}" role="img" aria-label="${xmlAttribute(siteSocialImageAlt(settings))}">`,
+    `<rect width="${socialImageSize.width}" height="${socialImageSize.height}" fill="${background}" />`,
+    `<g color="${foreground}" fill="${foreground}" stroke="${foreground}">`,
+    socialPreviewIconSvg(settings.identity.headerIconSvg),
+    "</g>",
+    `<text x="435" y="300" fill="${foreground}" font-family="Verdana, Arial, Helvetica, sans-serif" font-size="${nameSize}" font-weight="700">${xmlText(name)}</text>`,
+    `<text x="435" y="350" fill="${foreground}" fill-opacity="0.88" font-family="Verdana, Arial, Helvetica, sans-serif" font-size="${taglineSize}" font-weight="400">${xmlText(tagline)}</text>`,
+    "</svg>"
+  ].join("");
+}
+
+function organizationStructuredData(settings: SiteSettings, siteUrl: string): JsonLd | null {
+  const name = settings.contact.companyName.trim();
+  if (!name) return null;
+  return {
+    "@context": "https://schema.org",
+    "@id": `${siteUrl}#organization`,
+    "@type": "Organization",
+    name,
+    url: siteUrl,
+    ...(settings.contact.email ? { email: settings.contact.email } : {})
+  };
+}
+
+function socialPreviewIconSvg(svg: string) {
+  return svg
+    .replace(/\swidth="[^"]*"/i, "")
+    .replace(/\sheight="[^"]*"/i, "")
+    .replace("<svg", '<svg x="270" y="222" width="130" height="170"');
+}
+
+function fittedFontSize(text: string, base: number, minimum: number, comfortableCharacters: number) {
+  if (text.length <= comfortableCharacters) return base;
+  return Math.max(minimum, Math.floor(base * (comfortableCharacters / text.length)));
+}
+
+function xmlText(input: string) {
+  return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function xmlAttribute(input: string) {
+  return xmlText(input).replace(/"/g, "&quot;");
+}

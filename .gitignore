@@ -1,0 +1,13 @@
+.DS_Store
+*.log
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+deploy/hetzner/production.env
+coverage/
+node_modules/
+dist/
+
+# Local runtime state. Keep generated databases and uploads out of source.
+data/
