@@ -52,7 +52,7 @@ export function HomePage(props: {
                 <InlineLinks
                   links={[
                     ["Profile", publicProfilePath],
-                    ["Wall", `${publicProfilePath}#wall`],
+                    ["Posts", `${publicProfilePath}#wall`],
                     ["Blog", profileBlogPath(props.profile)],
                     ["Friends", profileFriendsPath(props.profile)],
                     ["Requests", "/requests"]

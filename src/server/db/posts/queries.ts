@@ -11,7 +11,7 @@ import {
   groupCommentSourceSql,
   pagedCommentActivityPostRows,
   postCommentActivityJoin,
-  wallCommentSourceSql
+  profileCommentSourceSql
 } from "./commentActivity.js";
 
 export function getPost(id: number, viewer: CurrentUser | null = null) {
@@ -33,7 +33,7 @@ export function getVisiblePost(id: number, viewer: CurrentUser | null) {
 export function postsForProfilePage(profileId: number, viewer: CurrentUser | null, options: PageOptions = {}) {
   const visiblePost = visiblePostAccessSql(viewer);
   const author = authorVisibleSql(viewer);
-  const commentActivity = postCommentActivityJoin(viewer, wallCommentSourceSql(profileId));
+  const commentActivity = postCommentActivityJoin(viewer, profileCommentSourceSql(profileId));
   return pagedCommentActivityPostRows(
     viewer,
     options,
@@ -42,11 +42,12 @@ export function postsForProfilePage(profileId: number, viewer: CurrentUser | nul
     `${commentActivity.sql}
     WHERE ${visiblePost.sql}
       AND ${author.sql}
-      AND po.wall_user_id = ?`,
+      AND (po.wall_user_id = ? OR (po.group_id IS NOT NULL AND po.author_id = ?))`,
     commentActivityTimestampSql,
     ...commentActivity.params,
     ...visiblePost.params,
     ...author.params,
+    profileId,
     profileId
   );
 }

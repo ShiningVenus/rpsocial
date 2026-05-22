@@ -118,6 +118,13 @@ export function wallCommentSourceSql(wallUserId: number): SqlFragment {
   return { sql: "activityPost.wall_user_id = ?", params: [wallUserId] };
 }
 
+export function profileCommentSourceSql(profileId: number): SqlFragment {
+  return {
+    sql: "(activityPost.wall_user_id = ? OR (activityPost.group_id IS NOT NULL AND activityPost.author_id = ?))",
+    params: [profileId, profileId]
+  };
+}
+
 export function groupCommentSourceSql(groupId: number): SqlFragment {
   return { sql: "activityPost.group_id = ?", params: [groupId] };
 }
