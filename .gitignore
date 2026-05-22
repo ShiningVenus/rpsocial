@@ -11,3 +11,11 @@ dist/
 
 # Local runtime state. Keep generated databases and uploads out of source.
 data/
+
+# Local SQLite databases, including WAL/SHM sidecar files.
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
