@@ -44,7 +44,7 @@ export function ProfileSidebar(props: ProfileSidebarProps) {
         </div>
       </div>
       {hasThemeSong ? (
-        <audio controls loop autoplay id="theme-song" {...profileSkinPart("theme-song")}>
+        <audio controls autoplay id="theme-song" {...profileSkinPart("theme-song")}>
           <source src={themeSongPath(props.profile.themeSong)} type={themeSongType} />
         </audio>
       ) : null}
