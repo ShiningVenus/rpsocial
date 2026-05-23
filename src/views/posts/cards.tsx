@@ -13,8 +13,10 @@ import { AuthorSkinBoundary, profileSkinPart } from "../../skins/rendering.js";
 import { groupPath, postImagePath, postPath, profilePath, reportPath } from "../../paths.js";
 import { LocalizedTime } from "../../ui/time.js";
 
+export type PostSkinSource = "author" | "surrounding-profile";
+
 export function PostList(props: {
-  authorSkins?: boolean;
+  skinSource?: PostSkinSource;
   user: CurrentUser | null;
   csrf: string;
   posts: PostItem[];
@@ -26,7 +28,7 @@ export function PostList(props: {
       {props.posts.length ? props.posts.map((post) => (
         <PostCard
           key={post.id}
-          authorSkins={props.authorSkins}
+          skinSource={props.skinSource}
           user={props.user}
           csrf={props.csrf}
           post={post}
@@ -38,7 +40,7 @@ export function PostList(props: {
 }
 
 export function PostCard(props: {
-  authorSkins?: boolean;
+  skinSource?: PostSkinSource;
   user: CurrentUser | null;
   csrf: string;
   post: PostItem;
@@ -48,7 +50,7 @@ export function PostCard(props: {
   const canDelete = canDeletePost(props.user, post);
   const canInteract = props.canInteract ?? Boolean(post.viewerCanInteract);
   const href = postPath(post);
-  const authorSkinHtml = props.authorSkins === false ? null : post.authorSkinHtml;
+  const authorSkinHtml = (props.skinSource ?? "author") === "author" ? post.authorSkinHtml : null;
   const engagementActions = (
     <>
       {props.user && canInteract ? (

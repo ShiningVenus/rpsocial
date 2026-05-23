@@ -26,7 +26,7 @@ export function WallBox(props: {
       ) : props.user ? <p><i>Only {props.profile.username}'s friends can post here.</i></p> : <p><a href="/login">Log in</a> to post.</p>}
       {!props.fullWall && props.viewAllHref ? <p>( <a href={props.viewAllHref}>View all</a> )</p> : null}
       <PostList
-        authorSkins={false}
+        skinSource="surrounding-profile"
         user={props.user}
         csrf={props.csrf}
         posts={props.posts}
