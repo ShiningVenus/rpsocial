@@ -246,6 +246,13 @@
   }
 }
 
+@media (max-width: 48em) {
+  :where([data-author-skin-layer="page"]) {
+    --author-skin-backdrop-inline-size: 100%;
+    --author-skin-shell-inline-size: 100%;
+  }
+}
+
 .profile h1 {
   font-size: var(--font-size-profile-heading);
   margin: 0;
