@@ -55,6 +55,39 @@
 }
 
 @media (max-width: 48em), (any-pointer: coarse) {
+  html,
+  body {
+    -ms-overflow-style: none;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    scrollbar-width: none;
+    touch-action: pan-x pan-y;
+    width: 100%;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  .master-container::-webkit-scrollbar {
+    display: none;
+    height: 0;
+    width: 0;
+  }
+
+  .master-container {
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+    touch-action: pan-x pan-y;
+  }
+
   :where(
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="button"]):not([type="reset"]):not([type="submit"]):not([type="image"]),
     textarea,
