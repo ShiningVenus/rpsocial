@@ -1,4 +1,5 @@
 import type { PostItem } from "../../models.js";
+import { anchors } from "../../anchors.js";
 import { canModerateTarget } from "../../roles.js";
 import type { CurrentUser } from "../../currentUser.js";
 import { ActionBar, ActionLabel } from "../../ui/actions.js";
@@ -79,7 +80,7 @@ export function PostCard(props: {
   );
   return (
     <AuthorSkinBoundary skinHtml={authorSkinHtml} contextParts={["wall"]} backdrop={props.authorSkinBackdrop ?? "container"}>
-      <article class="post-card" data-author-skin-part="post" {...profileSkinPart("post")}>
+      <article id={anchors.post(post)} class="post-card" data-author-skin-part="post" {...profileSkinPart("post")}>
         <CommentBumpLabel post={post} href={href} />
         <div class="post-card__header">
           <ProfileImageLink
@@ -114,7 +115,7 @@ function CommentBumpLabel({ post, href }: { post: PostItem; href: string }) {
     <p class="post-card__bump">
       <ActorSummary actors={bump.actors} hiddenCount={hiddenCount} /> commented on this post{" "}
       <span class="post-card__bump-separator" aria-hidden="true">&middot;</span>{" "}
-      <small><a href={`${href}#comments`}><LocalizedTime value={bump.commentedAt} /></a></small>
+      <small><a href={`${href}#${anchors.comments}`}><LocalizedTime value={bump.commentedAt} /></a></small>
     </p>
   );
 }

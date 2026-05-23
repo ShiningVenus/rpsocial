@@ -1,5 +1,6 @@
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { anchors } from "../../anchors.js";
 import { csrfToken, currentUser } from "../../server/auth/session.js";
 import { requireAuth, requireBlog, requireOwnerOrAdmin, requireProfile, visibleProfile } from "../../server/access.js";
 import { scanAutomodSubmission } from "../../server/db/automod.js";
@@ -20,7 +21,7 @@ import { audit, moderationSubjectAuditMetadata } from "../../server/db/moderatio
 import { notifyBlogComment, notifyBlogProp } from "../../server/db/notifications/index.js";
 import { addCommentFromForm, deleteCommentFromRoute } from "../../server/comments/actions.js";
 import { field } from "../../server/forms.js";
-import { badFormRequestMessage, requiredBlogBody, requiredField, routeId, verifiedActionForm } from "../../server/http.js";
+import { badFormRequestMessage, localBack, requiredBlogBody, requiredField, routeId, verifiedActionForm } from "../../server/http.js";
 import { canDeleteAsOwnerOrModerator, canModerateAuthor } from "../../server/moderation/guards.js";
 import { previewFromRows } from "../../server/pagination.js";
 import { defaultBlogCategory, isBlogCategory, limits } from "../../policy.js";
@@ -110,16 +111,21 @@ export function registerBlogRoutes(app: Hono<AppBindings>) {
     const form = await verifiedActionForm(c, "comment.create");
     const { blog } = viewableBlog(c);
     if (!blog.commentsEnabled) throw new HTTPException(403, { message: "Comments are disabled for this entry." });
+    const reply = Boolean(field(form, "parentId"));
     return addCommentFromForm(c, user, {
       form,
       subjectType: "blog_comment",
-      redirect: `${blogPath(blog)}#comments`,
+      redirect: (commentId) =>
+        localBack(c, reply ? blogCommentsPath(blog) : blogPath(blog), {
+          avoid: reply ? [blogPath(blog)] : undefined,
+          fragment: anchors.comment(commentId)
+        }),
       add: (textHtml, parentId) => addBlogComment(blog.id, user.id, textHtml, parentId, user),
       afterAdd: notifyBlogComment
     });
   });
   app.post("/b/comments/:id/delete", (c) =>
-    deleteCommentFromRoute(c, { subjectType: "blog_comment", delete: deleteBlogComment, fallback: "/blog" })
+    deleteCommentFromRoute(c, { subjectType: "blog_comment", delete: deleteBlogComment, fallback: "/blog", redirectFragment: anchors.comments })
   );
   app.get("/b/:id/comments", (c) => blogPage(c, true));
   app.get("/b/:id", (c) => blogPage(c));
@@ -161,7 +167,7 @@ async function blogPropAction(
   visibleProfile(c, blog.authorId);
   if (!canViewBlog(user, blog)) throw new HTTPException(403, { message: "You cannot prop this blog entry." });
   if (action(blog.id, user.id)) afterChange?.(blog.id, user.id);
-  return c.redirect(blogPath(blog));
+  return c.redirect(localBack(c, blogPath(blog), { fragment: anchors.blog(blog) }));
 }
 
 function blogFields(form: Record<string, unknown>) {

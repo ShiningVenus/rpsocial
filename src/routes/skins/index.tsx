@@ -1,5 +1,6 @@
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { anchors } from "../../anchors.js";
 import { requireAuth, requireOwnerOrAdmin, requireProfile, requireSkin, visibleProfile } from "../../server/access.js";
 import { csrfToken, currentUser } from "../../server/auth/session.js";
 import { scanAutomodSubmission } from "../../server/db/automod.js";
@@ -18,7 +19,7 @@ import { notifySkinComment } from "../../server/db/notifications/index.js";
 import { addCommentFromForm, deleteCommentFromRoute } from "../../server/comments/actions.js";
 import { updateProfile } from "../../server/db/users.js";
 import { field } from "../../server/forms.js";
-import { badFormRequestMessage, requiredField, requiredUserText, routeId, verifiedActionForm } from "../../server/http.js";
+import { badFormRequestMessage, localBack, requiredField, requiredUserText, routeId, verifiedActionForm, withFragment } from "../../server/http.js";
 import { canDeleteAsOwnerOrModerator, canModerateAuthor } from "../../server/moderation/guards.js";
 import { previewFromRows } from "../../server/pagination.js";
 import { limits } from "../../policy.js";
@@ -93,7 +94,7 @@ export function registerSkinRoutes(app: Hono<AppBindings>) {
     await verifiedActionForm(c, "profile.write");
     const skin = viewableSkin(c);
     updateProfile(user.id, { skinHtml: skin.codeHtml });
-    return c.redirect("/account/profile");
+    return c.redirect(withFragment("/account/profile", "skin"));
   });
   app.post("/s/:id/delete", async (c) => {
     const user = requireAuth(c);
@@ -110,16 +111,21 @@ export function registerSkinRoutes(app: Hono<AppBindings>) {
     const user = requireAuth(c);
     const form = await verifiedActionForm(c, "comment.create");
     const skin = viewableSkin(c);
+    const reply = Boolean(field(form, "parentId"));
     return addCommentFromForm(c, user, {
       form,
       subjectType: "skin_comment",
-      redirect: `${skinPath(skin)}#comments`,
+      redirect: (commentId) =>
+        localBack(c, reply ? skinCommentsPath(skin) : skinPath(skin), {
+          avoid: reply ? [skinPath(skin)] : undefined,
+          fragment: anchors.comment(commentId)
+        }),
       add: (textHtml, parentId) => addSkinComment(skin.id, user.id, textHtml, parentId, user),
       afterAdd: notifySkinComment
     });
   });
   app.post("/s/comments/:id/delete", (c) =>
-    deleteCommentFromRoute(c, { subjectType: "skin_comment", delete: deleteSkinComment, fallback: "/skins" })
+    deleteCommentFromRoute(c, { subjectType: "skin_comment", delete: deleteSkinComment, fallback: "/skins", redirectFragment: anchors.comments })
   );
   app.get("/s/:id/comments", (c) => skinPage(c, true));
   app.get("/s/:id", (c) => skinPage(c));

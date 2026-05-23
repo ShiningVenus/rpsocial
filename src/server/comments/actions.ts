@@ -20,7 +20,7 @@ export async function addCommentFromForm(
     add: AddComment;
     afterAdd?: (commentId: number) => void;
     form?: Record<string, unknown>;
-    redirect: string;
+    redirect: string | ((commentId: number) => string);
     subjectType: ReportSubjectType;
   }
 ) {
@@ -33,7 +33,7 @@ export async function addCommentFromForm(
 
   input.afterAdd?.(commentId);
   automod.createReports({ subjectType: input.subjectType, subjectId: commentId, authorId: user.id });
-  return c.redirect(input.redirect);
+  return c.redirect(typeof input.redirect === "function" ? input.redirect(commentId) : input.redirect);
 }
 
 export async function deleteCommentFromRoute(
@@ -41,6 +41,7 @@ export async function deleteCommentFromRoute(
   input: {
     delete: DeleteComment;
     fallback: string;
+    redirectFragment?: string;
     subjectType: ReportSubjectType;
   }
 ) {
@@ -57,5 +58,5 @@ export async function deleteCommentFromRoute(
   }
 
   if (elevated) audit(user.id, "delete", input.subjectType, commentId, "", subject ? auditSubjectMetadata(subject) : {});
-  return c.redirect(localBack(c, input.fallback));
+  return c.redirect(localBack(c, subject?.url ?? input.fallback, { fragment: input.redirectFragment }));
 }

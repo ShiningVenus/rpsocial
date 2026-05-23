@@ -1,7 +1,8 @@
 import type { CurrentUser } from "../../currentUser.js";
 import type { NotificationItem } from "../../models.js";
+import { anchors } from "../../anchors.js";
 import { commentNotificationKinds, notificationKinds, notificationTextByKind } from "../../notifications.js";
-import { blogPath, postPath, profilePath, skinPath } from "../../paths.js";
+import { blogCommentsPath, blogPath, postPath, profilePath, skinCommentsPath, skinPath } from "../../paths.js";
 import { Layout, PageFrame } from "../../shell/index.js";
 import { ActionLabel } from "../../ui/actions.js";
 import { ActorSummary, type ActorSummaryItem } from "../../ui/actors.js";
@@ -108,14 +109,14 @@ function notificationText(item: NotificationItem) {
 }
 
 function notificationHref(item: NotificationItem) {
-  const commentAnchor = commentNotificationKinds.has(item.kind) ? "#comments" : "";
+  const commentAnchor = commentNotificationKinds.has(item.kind) ? `#${anchors.comment(item.subjectId)}` : "";
   switch (item.contextType) {
     case "blog":
-      return `${blogPath(item.contextId)}${commentAnchor}`;
+      return commentAnchor ? `${blogCommentsPath(item.contextId)}${commentAnchor}` : blogPath(item.contextId);
     case "post":
       return `${postPath(item.contextId)}${commentAnchor}`;
     case "skin":
-      return `${skinPath(item.contextId)}${commentAnchor}`;
+      return commentAnchor ? `${skinCommentsPath(item.contextId)}${commentAnchor}` : skinPath(item.contextId);
     case "user":
       return profilePath(item.actorHandle);
   }

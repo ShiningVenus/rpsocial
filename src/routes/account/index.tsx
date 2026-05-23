@@ -1,4 +1,5 @@
 import type { Hono } from "hono";
+import { anchors } from "../../anchors.js";
 import { requireAuth, requireProfile, visibleProfile } from "../../server/access.js";
 import { csrfToken, destroySession, revokeOtherSessions } from "../../server/auth/session.js";
 import { hashPassword, verifyPassword } from "../../server/auth/password.js";
@@ -15,7 +16,7 @@ import { proppedBlogsForViewer } from "../../server/db/blogs/index.js";
 import { postImageFilenamesForAccount, proppedPostsForViewer } from "../../server/db/posts/index.js";
 import { deleteAccount, getUserByEmail, updateEmail, updatePassword, updateProfile, updateTimeZone } from "../../server/db/users.js";
 import { field } from "../../server/forms.js";
-import { formId, verifiedActionForm } from "../../server/http.js";
+import { formId, localBack, verifiedActionForm } from "../../server/http.js";
 import { deletePostImages, deleteProfileImage, deleteProfileThemeSong } from "../../server/media/upload.js";
 import { limits, minimumCharacterLabel, validEmail } from "../../policy.js";
 import { isSupportedTimeZone } from "../../timeZones.js";
@@ -69,14 +70,14 @@ export function registerAccountRoutes(app: Hono<AppBindings>) {
     const id = formId(form);
     const { profile } = visibleProfile(c, id);
     if (addFavorite(user.id, id)) notifyFavorite(user.id, id);
-    return c.redirect(profilePath(profile));
+    return c.redirect(localBack(c, profilePath(profile), { fragment: anchors.profileActions }));
   });
 
   app.post("/favorites", async (c) => {
     const user = requireAuth(c);
     const form = await verifiedActionForm(c, "relationship.write");
     removeFavorite(user.id, formId(form));
-    return c.redirect("/favorites");
+    return c.redirect(localBack(c, "/favorites"));
   });
 
   app.get("/props", (c) => {

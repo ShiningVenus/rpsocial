@@ -1,4 +1,5 @@
 import type { UserProfile } from "../../models.js";
+import { anchors } from "../../anchors.js";
 import { canModerateTarget, isAdminUser } from "../../roles.js";
 import type { CurrentUser } from "../../currentUser.js";
 import { newMessagePath, reportPath } from "../../paths.js";
@@ -40,7 +41,7 @@ export function ProfileActionsPanel(props: ProfileActionProps) {
   const canModerateProfile = Boolean(props.user && !props.ownProfile && canModerateTarget(props.user, props.profile));
 
   return (
-    <Panel className="profile__actions-panel profile-card" dataAttributes={profileSkinPart("actions")} title="Profile actions">
+    <Panel id={anchors.profileActions} className="profile__actions-panel profile-card" dataAttributes={profileSkinPart("actions")} title="Profile actions">
       <div class="profile-actions">
         <ActionCell>
           {props.ownProfile ? <ProfileActionLink href="/account/profile" icon="user">Edit profile</ProfileActionLink> : props.user && props.protectedAdminProfile ? (

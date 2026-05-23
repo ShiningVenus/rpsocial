@@ -71,7 +71,7 @@ export function registerPeopleRoutes(app: Hono<AppBindings>) {
     const id = formId(form);
     const action = field(form, "action");
     formAction(friendActions, action, "Unknown friend action.")({ c, user, id });
-    return c.redirect(action === "accept" ? "/requests" : localBack(c, profilePath(requireProfile(id))));
+    return c.redirect(localBack(c, profilePath(requireProfile(id))));
   });
 
   app.get("/requests", (c) => {

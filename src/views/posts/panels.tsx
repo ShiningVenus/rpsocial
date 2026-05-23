@@ -1,4 +1,5 @@
 import type { GroupItem, PostItem, UserProfile } from "../../models.js";
+import { anchors } from "../../anchors.js";
 import type { CurrentUser } from "../../currentUser.js";
 import { PaginationNav } from "../../ui/pagination.js";
 import { Panel } from "../../ui/panels.js";
@@ -19,7 +20,7 @@ export function WallBox(props: {
   viewAllHref?: string | null;
 }) {
   return (
-    <Panel className="profile__wall profile-card post-panel" dataAttributes={profileSkinPart("wall")} id="wall" title={`${props.profile.username}'s posts`}>
+    <Panel className="profile__wall profile-card post-panel" dataAttributes={profileSkinPart("wall")} id={anchors.wall} title={`${props.profile.username}'s posts`}>
       {props.canPost ? (
         <PostComposer action={profileWallPath(props.profile)} csrf={props.csrf} button="Post to wall" />
       ) : props.user ? <p><i>Only {props.profile.username}'s friends can post here.</i></p> : <p><a href="/login">Log in</a> to post.</p>}
@@ -49,7 +50,7 @@ export function GroupPostBox(props: {
   viewAllHref?: string | null;
 }) {
   return (
-    <Panel className="post-panel post-panel--author-skin-bleed" id="group-posts" title="Posts" tone="soft">
+    <Panel className="post-panel post-panel--author-skin-bleed" id={anchors.groupPosts} title="Posts" tone="soft">
       {props.isMember ? (
         <PostComposer action={`${groupPath(props.group)}/posts`} csrf={props.csrf} button="Post" />
       ) : <p><i>Only group members can post, prop, or comment.</i></p>}

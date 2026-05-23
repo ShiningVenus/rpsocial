@@ -31,7 +31,7 @@ function commentSubject(type: string, id: number) {
   const source = commentSourceFor(type);
   if (!source) return undefined;
   const data = source.row(id);
-  return subject(type, id, source.label, data ? { ...data, url: source.url(Number(data.parentId)) } : undefined, true);
+  return subject(type, id, source.label, data ? { ...data, url: source.url(Number(data.parentId), id) } : undefined, true);
 }
 
 function subject(type: string, id: number, label: string, data: SubjectRow | undefined, canDelete: boolean) {

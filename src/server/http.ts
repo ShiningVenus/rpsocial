@@ -7,6 +7,11 @@ import { assertActionRateLimit } from "./rateLimit.js";
 import { plainTextFromHtml, sanitizeBlogBody, sanitizeUserText } from "./security/html.js";
 import type { AppContext } from "./context.js";
 
+type LocalBackOptions = {
+  avoid?: readonly string[];
+  fragment?: string | null;
+};
+
 export function routeId(c: AppContext, name = "id") {
   const id = Number(c.req.param(name));
   if (!Number.isSafeInteger(id) || id < 1) throw new HTTPException(404, { message: "Not found." });
@@ -96,16 +101,42 @@ export function statusTitle(status: number) {
   return status >= 500 ? "Server error" : "Request error";
 }
 
-export function localBack(c: AppContext, fallback: string) {
+export function localBack(c: AppContext, fallback: string, options: LocalBackOptions = {}) {
   const referer = c.req.header("Referer");
-  if (!referer) return fallback;
-  if (referer.startsWith("/") && !referer.startsWith("//")) return referer;
+  if (!referer) return withFragment(fallback, options.fragment);
+  if (referer.startsWith("/") && !referer.startsWith("//")) return safeLocalBackTarget(referer, fallback, options);
   try {
     const url = new URL(referer);
     const requestOrigin = new URL(c.req.url).origin;
-    if (url.origin === env.baseOrigin || url.origin === requestOrigin) return `${url.pathname}${url.search}${url.hash}`;
+    if (url.origin === env.baseOrigin || url.origin === requestOrigin) return safeLocalBackTarget(`${url.pathname}${url.search}${url.hash}`, fallback, options);
   } catch {
-    return fallback;
+    return withFragment(fallback, options.fragment);
   }
-  return fallback;
+  return withFragment(fallback, options.fragment);
+}
+
+export function withFragment(target: string, fragment?: string | null) {
+  if (!fragment) return target;
+  const id = fragment.replace(/^#/, "").trim();
+  if (!id) return target;
+  return `${target.replace(/#.*$/, "")}#${encodeURIComponent(id)}`;
+}
+
+function safeLocalBackTarget(target: string, fallback: string, options: LocalBackOptions) {
+  const destination = avoidedLocalTarget(target, options.avoid) ? fallback : target;
+  return withFragment(destination, options.fragment);
+}
+
+function avoidedLocalTarget(target: string, avoid: readonly string[] | undefined) {
+  if (!avoid?.length) return false;
+  const targetPath = localTargetPath(target);
+  return avoid.some((path) => localTargetPath(path) === targetPath);
+}
+
+function localTargetPath(target: string) {
+  try {
+    return new URL(target, env.baseUrl).pathname;
+  } catch {
+    return target.split(/[?#]/, 1)[0];
+  }
 }

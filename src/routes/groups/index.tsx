@@ -15,7 +15,7 @@ import {
 } from "../../server/db/groups.js";
 import { audit, moderationSubjectAuditMetadata } from "../../server/db/moderation/index.js";
 import { postImageFilenamesForGroup, postsForGroupPage } from "../../server/db/posts/index.js";
-import { badFormRequestMessage, requiredField, requiredUserText, routeId, verifiedActionForm } from "../../server/http.js";
+import { badFormRequestMessage, localBack, requiredField, requiredUserText, routeId, verifiedActionForm } from "../../server/http.js";
 import { deletePostImages } from "../../server/media/upload.js";
 import { canDeleteAsOwnerOrModerator, canModerateAuthor } from "../../server/moderation/guards.js";
 import { beforeParam, paginationHref } from "../../server/pagination.js";
@@ -112,14 +112,14 @@ async function joinGroupAction(c: AppContext) {
   await verifiedActionForm(c, "relationship.write");
   const { user, group } = visibleGroup(c, routeId(c));
   joinGroup(group.id, user.id);
-  return c.redirect(groupPath(group));
+  return c.redirect(localBack(c, groupPath(group)));
 }
 
 async function leaveGroupAction(c: AppContext) {
   const { user, group } = visibleGroup(c, routeId(c));
   await verifiedActionForm(c, "relationship.write");
   leaveGroup(group.id, user.id);
-  return c.redirect(groupPath(group));
+  return c.redirect(localBack(c, groupPath(group)));
 }
 
 function groupFields(form: Record<string, unknown>) {

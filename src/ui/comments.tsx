@@ -4,6 +4,7 @@ import { UserContent } from "./userContent.js";
 import { CharacterLimitHint, CsrfInput } from "./forms.js";
 import { DiscussionEntry } from "./discussion.js";
 import { Panel } from "./panels.js";
+import { anchors } from "../anchors.js";
 import { reportPath } from "../paths.js";
 import type { CommentItem } from "../models.js";
 import { limits, type ReportSubjectType } from "../policy.js";
@@ -80,6 +81,7 @@ export function CommentList(props: {
             authorHandle={comment.authorHandle}
             className={comment.parentId ? "discussion-entry--reply" : undefined}
             createdAt={comment.createdAt}
+            id={anchors.comment(comment)}
             authorSkinHtml={comment.authorSkinHtml}
             pfp={comment.pfp}
             username={comment.username}
@@ -116,7 +118,7 @@ export function CommentPanel(props: {
   user: CurrentUser | null;
 }) {
   return (
-    <Panel className="comments-panel" id="comments" title={props.title ?? "Comments"} tone="soft">
+    <Panel className="comments-panel" id={anchors.comments} title={props.title ?? "Comments"} tone="soft">
       {props.fullHref ? (
         <p>
           <b>

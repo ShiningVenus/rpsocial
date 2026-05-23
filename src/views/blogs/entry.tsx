@@ -1,4 +1,5 @@
 import type { BlogItem, CommentItem } from "../../models.js";
+import { anchors } from "../../anchors.js";
 import { canModerateTarget, isAdminUser } from "../../roles.js";
 import type { CurrentUser } from "../../currentUser.js";
 import { ActionBar, ActionLabel } from "../../ui/actions.js";
@@ -70,7 +71,7 @@ export function BlogEntryPage(props: {
           </div>
         </SplitPane>
         <SplitPane area="main">
-          <h1 class="article-title" itemprop="headline name">{props.blog.title}</h1>
+          <h1 id={anchors.blog(props.blog)} class="article-title" itemprop="headline name">{props.blog.title}</h1>
           {engagementActions || managementActions ? <ActionBar className="content-actions" primary={engagementActions} secondary={managementActions} /> : null}
           <UserContent className="article-content" html={props.blog.bodyHtml} itemprop="articleBody" />
           {props.blog.commentsEnabled ? (

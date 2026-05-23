@@ -2,7 +2,7 @@ import type { Hono } from "hono";
 import { requireAuth } from "../../server/access.js";
 import { csrfToken } from "../../server/auth/session.js";
 import { markVisibleNotificationsRead, notificationsForUser, unreadNotificationCount } from "../../server/db/notifications/index.js";
-import { verifiedActionForm } from "../../server/http.js";
+import { localBack, verifiedActionForm } from "../../server/http.js";
 import { beforeParam, paginationHref } from "../../server/pagination.js";
 import { notificationsPath } from "../../paths.js";
 import type { AppBindings } from "../../server/context.js";
@@ -30,6 +30,6 @@ export function registerNotificationRoutes(app: Hono<AppBindings>) {
     const user = requireAuth(c);
     await verifiedActionForm(c, "notification.write");
     markVisibleNotificationsRead(user);
-    return c.redirect(notificationsPath);
+    return c.redirect(localBack(c, notificationsPath));
   });
 }

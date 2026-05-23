@@ -13,12 +13,13 @@ export function DiscussionEntry(props: {
   children: Child;
   className?: string;
   createdAt: string;
+  id?: string;
   pfp: string;
   username: string;
 }) {
   return (
     <AuthorSkinBoundary skinHtml={props.authorSkinHtml} contextParts={["wall"]} backdrop="item">
-      <article class={classNames("discussion-entry", props.className)} data-author-skin-part="comment" {...profileSkinPart("comment")}>
+      <article id={props.id} class={classNames("discussion-entry", props.className)} data-author-skin-part="comment" {...profileSkinPart("comment")}>
         <div class="discussion-entry__author">
           <ProfileImageLink
             alt={`${props.username}'s profile picture`}

@@ -1,5 +1,6 @@
 import type { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { anchors } from "../../anchors.js";
 import { requireAuth, visibleGroup, visibleProfile } from "../../server/access.js";
 import { csrfToken } from "../../server/auth/session.js";
 import { scanAutomodSubmission } from "../../server/db/automod.js";
@@ -24,7 +25,7 @@ import { audit, moderationSubjectAuditMetadata } from "../../server/db/moderatio
 import { notifyPostComment, notifyPostProp } from "../../server/db/notifications/index.js";
 import { addCommentFromForm, deleteCommentFromRoute } from "../../server/comments/actions.js";
 import { fileField } from "../../server/forms.js";
-import { localBack, requiredUserText, routeId, verifiedActionForm } from "../../server/http.js";
+import { localBack, requiredUserText, routeId, verifiedActionForm, withFragment } from "../../server/http.js";
 import { deletePostImage, savePostImage } from "../../server/media/upload.js";
 import { canDeleteAsOwnerOrModerator, canModerateAuthor } from "../../server/moderation/guards.js";
 import { beforeParam, paginationHref } from "../../server/pagination.js";
@@ -51,9 +52,9 @@ export function registerPostRoutes(app: Hono<AppBindings>) {
     );
   });
 
-  app.post("/feed", (c) => createWallPostAction(c, (user) => user.id, () => "/feed"));
+  app.post("/feed", (c) => createWallPostAction(c, (user) => user.id, (_profile, postId) => withFragment("/feed", anchors.post(postId))));
   app.post("/u/:handle/wall", (c) =>
-    createWallPostAction(c, () => routeProfileHandle(c), (profile) => `${profilePath(profile)}#wall`)
+    createWallPostAction(c, () => routeProfileHandle(c), (profile, postId) => withFragment(profilePath(profile), anchors.post(postId)))
   );
 
   app.post("/g/:id/posts", async (c) => {
@@ -63,11 +64,11 @@ export function registerPostRoutes(app: Hono<AppBindings>) {
     if (!canPostToGroup(user.id, group.id)) throw new HTTPException(403, { message: "Only group members can post here." });
     const post = await createPostFromForm(form, (bodyHtml, media) => createGroupPost(user.id, group.id, bodyHtml, media));
     post.automod.createReports({ subjectType: "post", subjectId: post.id, authorId: user.id });
-    return c.redirect(`${groupPath(group)}#group-posts`);
+    return c.redirect(withFragment(groupPath(group), anchors.post(post.id)));
   });
 
   app.post("/p/comments/:id/delete", (c) =>
-    deleteCommentFromRoute(c, { subjectType: "post_comment", delete: deletePostComment, fallback: "/feed" })
+    deleteCommentFromRoute(c, { subjectType: "post_comment", delete: deletePostComment, fallback: "/feed", redirectFragment: anchors.comments })
   );
 
   app.post("/p/:id/prop", async (c) => propAction(c, addPostProp, notifyPostProp));
@@ -81,7 +82,7 @@ export function registerPostRoutes(app: Hono<AppBindings>) {
     return addCommentFromForm(c, user, {
       form,
       subjectType: "post_comment",
-      redirect: `${postPath(post)}#comments`,
+      redirect: (commentId) => localBack(c, postPath(post), { fragment: anchors.comment(commentId) }),
       add: (textHtml, parentId) => addPostComment(post.id, user.id, textHtml, parentId, user),
       afterAdd: notifyPostComment
     });
@@ -100,7 +101,7 @@ export function registerPostRoutes(app: Hono<AppBindings>) {
     if (deletedMedia === false) throw new HTTPException(403, { message: "You cannot delete this post." });
     await deletePostImage(deletedMedia);
     if (elevated) audit(user.id, "delete", "post", post.id, "", auditMetadata);
-    return c.redirect(localBack(c, "/feed"));
+    return c.redirect(localBack(c, "/feed", { avoid: [postPath(post)] }));
   });
 
   app.get("/p/:id", (c) => {
@@ -121,7 +122,7 @@ export function registerPostRoutes(app: Hono<AppBindings>) {
 async function createWallPostAction(
   c: AppContext,
   profileIdFor: (user: CurrentUser) => number,
-  redirectFor: (profile: UserProfile) => string
+  redirectFor: (profile: UserProfile, postId: number) => string
 ) {
   const user = requireAuth(c);
   const form = await verifiedActionForm(c, "post.create");
@@ -129,7 +130,7 @@ async function createWallPostAction(
   if (!canPostToWall(user.id, profile.id)) throw new HTTPException(403, { message: "You cannot post on this wall." });
   const post = await createPostFromForm(form, (bodyHtml, media) => createWallPost(user.id, profile.id, bodyHtml, media));
   post.automod.createReports({ subjectType: "post", subjectId: post.id, authorId: user.id });
-  return c.redirect(redirectFor(profile));
+  return c.redirect(redirectFor(profile, post.id));
 }
 
 async function propAction(
@@ -142,7 +143,7 @@ async function propAction(
   const post = visiblePost(c, user);
   if (!canInteractWithPost(post, user.id)) throw new HTTPException(403, { message: "You cannot prop this post." });
   if (action(post.id, user.id)) afterChange?.(post.id, user.id);
-  return c.redirect(localBack(c, postPath(post)));
+  return c.redirect(localBack(c, postPath(post), { fragment: anchors.post(post) }));
 }
 
 function visiblePost(c: AppContext, user: CurrentUser) {

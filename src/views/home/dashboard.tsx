@@ -1,4 +1,5 @@
 import type { BlogListItem, GroupItem, PersonCard, PostItem, UserProfile } from "../../models.js";
+import { anchors } from "../../anchors.js";
 import type { SiteSettings } from "../../settings/site.js";
 import type { CurrentUser } from "../../currentUser.js";
 import { Icon } from "../../ui/icons.js";
@@ -53,7 +54,7 @@ export function HomePage(props: {
                 <InlineLinks
                   links={[
                     ["Profile", publicProfilePath],
-                    ["Posts", `${publicProfilePath}#wall`],
+                    ["Posts", `${publicProfilePath}#${anchors.wall}`],
                     ["Blog", profileBlogPath(props.profile)],
                     ["Friends", profileFriendsPath(props.profile)],
                     ["Requests", "/requests"]

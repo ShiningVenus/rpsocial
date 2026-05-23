@@ -1,7 +1,8 @@
 import { sqlite } from "../client.js";
+import { anchors } from "../../../anchors.js";
 import type { CommentReportSubjectType, ContentReportSubjectType } from "../../../policy.js";
 import type { CommentTarget } from "../comments.js";
-import { blogPath, groupPath, postPath, profilePath, skinPath } from "../../../paths.js";
+import { blogCommentsPath, blogPath, groupPath, postPath, profilePath, skinCommentsPath, skinPath } from "../../../paths.js";
 
 export type SubjectRow = {
   title?: string | null;
@@ -17,7 +18,7 @@ export type SubjectRow = {
 type CommentSource = {
   target: CommentTarget;
   label: string;
-  url: (parentId: number) => string;
+  url: (parentId: number, commentId: number) => string;
   row: (id: number) => SubjectRow | undefined;
 };
 
@@ -31,19 +32,19 @@ const commentSources = {
   blog_comment: {
     target: "blog",
     label: "Blog comment",
-    url: (parentId: number) => `${blogPath(parentId)}#comments`,
+    url: (parentId: number, commentId: number) => `${blogCommentsPath(parentId)}#${anchors.comment(commentId)}`,
     row: (id: number) => commentRow("blog_comments", "blog_id", id)
   },
   post_comment: {
     target: "post",
     label: "Post comment",
-    url: (parentId: number) => `${postPath(parentId)}#comments`,
+    url: (parentId: number, commentId: number) => `${postPath(parentId)}#${anchors.comment(commentId)}`,
     row: (id: number) => commentRow("post_comments", "post_id", id)
   },
   skin_comment: {
     target: "skin",
     label: "Skin comment",
-    url: (parentId: number) => `${skinPath(parentId)}#comments`,
+    url: (parentId: number, commentId: number) => `${skinCommentsPath(parentId)}#${anchors.comment(commentId)}`,
     row: (id: number) => commentRow("skin_comments", "skin_id", id)
   }
 } as const satisfies Record<CommentReportSubjectType, CommentSource>;
