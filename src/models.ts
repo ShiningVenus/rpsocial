@@ -52,6 +52,7 @@ export type CommentItem = {
   authorId: number;
   authorRole: string;
   authorHandle: string;
+  authorSkinHtml: string;
   username: string;
   pfp: string;
   parentId: number | null;
@@ -132,6 +133,7 @@ export type PostItem = {
   authorId: number;
   authorRole: string;
   authorHandle: string;
+  authorSkinHtml: string;
   username: string;
   pfp: string;
   wallUserId: number | null;

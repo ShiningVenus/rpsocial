@@ -3,7 +3,7 @@ import { messageFormContexts } from "../../messages.js";
 import { messageDeletePath, newMessagePath, profilePath, reportPath } from "../../paths.js";
 import { limits } from "../../policy.js";
 import { ActionBar, ActionLabel } from "../../ui/actions.js";
-import { ProfileImage } from "../../ui/avatars.js";
+import { ProfileImageLink } from "../../ui/avatars.js";
 import { classNames } from "../../ui/classes.js";
 import { CsrfInput, FormActions, FormError, FormField, FormStack } from "../../ui/forms.js";
 import { MetaSubjectLink } from "../../ui/meta.js";
@@ -71,9 +71,11 @@ function MessageEntry(props: { csrf: string; message: MessageItem; viewerId: num
   return (
     <article id={`message-${props.message.id}`} class={classNames("message-entry", own && "message-entry--own")}>
       <div class="message-entry__header">
-        <ProfileImage
+        <ProfileImageLink
           alt={`${author.name}'s profile picture`}
           filename={author.pfp}
+          href={profilePath(author.handle)}
+          label={`View ${author.name}'s profile`}
           loading="lazy"
           variant="avatar-compact"
         />

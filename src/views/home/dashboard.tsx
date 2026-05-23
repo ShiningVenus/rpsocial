@@ -7,6 +7,7 @@ import { ProfileImage } from "../../ui/avatars.js";
 import { CommunityBox } from "../../ui/groups.js";
 import { PeopleBox } from "../../ui/people.js";
 import { blogPath, profileBlogPath, profileFriendsPath, profilePath } from "../../paths.js";
+import { AuthorSkinStyles } from "../../skins/rendering.js";
 import { PreviewTitleLink } from "../../ui/previews.js";
 import { InlineLinks } from "../../ui/links.js";
 import { Layout, SplitLayout, SplitPane } from "../../shell/index.js";
@@ -30,7 +31,7 @@ export function HomePage(props: {
 }) {
   const publicProfilePath = profilePath(props.profile);
   return (
-    <Layout title="Home" user={props.user}>
+    <Layout title="Home" user={props.user} head={<AuthorSkinStyles items={props.feedPosts} />}>
       <SplitLayout variant="dashboard">
         <SplitPane area="sidebar">
           <Panel className="home-actions" title={<>Hello, {props.profile.username}!</>} headingLevel="h1">

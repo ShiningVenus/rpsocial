@@ -18,7 +18,7 @@ import { ProfileLayout, type ProfilePageProps } from "../profile/index.js";
 import { builtinSkinAttribution } from "../../skins/builtin.js";
 import { skinBrowserThemeColorFromHtml } from "../../skins/colorPalette.js";
 import { ProfileSkinDocsLink, ProfileSkinHtmlHint } from "../../skins/docs.js";
-import { profileSkinFromHtml, profileSkinPageAttributes, ProfileSkinStyles } from "../../skins/rendering.js";
+import { AuthorSkinStyles, profileSkinFromHtml, profileSkinPageAttributes, ProfileSkinStyles } from "../../skins/rendering.js";
 import { SkinColorPaletteEditor, skinColorPaletteEditorStylesheet } from "../../skins/colorPaletteEditor.js";
 import type { ColorPalette } from "../../theme/colorPalette.js";
 
@@ -135,7 +135,7 @@ export function SkinDetailPage(props: {
     </>
   );
   return (
-    <Layout title={props.skin.title} user={props.user} seo={skinSeo(props.skin)}>
+    <Layout title={props.skin.title} user={props.user} head={<AuthorSkinStyles items={props.comments} />} seo={skinSeo(props.skin)}>
       <PageFrame
         back={props.fullComments ? <BackLink href={href} label={props.skin.title} /> : <BackToPage page="skins" />}
         title={props.skin.title}
@@ -211,7 +211,7 @@ export function SkinPreviewPage(props: { user: CurrentUser; skin: SkinItem; prof
       user={props.user}
       bodyAttributes={profileSkinPageAttributes(skin)}
       browserThemeColor={(branding) => skinBrowserThemeColorFromHtml(skin.styleHtml, branding.palette)}
-      head={<ProfileSkinStyles skin={skin} />}
+      head={<><ProfileSkinStyles skin={skin} /><AuthorSkinStyles surroundingSkinAuthorId={props.profileProps.profile.id} items={props.profileProps.wallPosts} /></>}
     >
       <PageFrame back={<BackLink href={skinPath(props.skin)} label={props.skin.title} />} title={props.skin.title} />
       <ProfileLayout {...props.profileProps} skin={skin} />

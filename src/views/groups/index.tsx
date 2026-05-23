@@ -7,6 +7,7 @@ import { ActionBar, ActionLabel } from "../../ui/actions.js";
 import { GroupSummaryCard } from "../../ui/groups.js";
 import { BackLink, BackToPage } from "../../ui/links.js";
 import { GroupPostBox } from "../posts/index.js";
+import { AuthorSkinStyles } from "../../skins/rendering.js";
 import { UserContent } from "../../ui/userContent.js";
 import { CharacterLimitHint, CsrfInput, FormActions, FormError, FormField, FormStack } from "../../ui/forms.js";
 import { MetaSubjectLink } from "../../ui/meta.js";
@@ -92,7 +93,7 @@ export function GroupPage(props: GroupPageProps) {
     <ActionBar className="group-actions" primary={<>{membershipAction}{managementActions}</>} />
   ) : null;
   return (
-    <Layout title={props.group.name} user={props.user}>
+    <Layout title={props.group.name} user={props.user} head={<AuthorSkinStyles items={props.posts} />}>
       <PageFrame
         back={props.fullPosts ? <BackLink href={groupHref} label={props.group.name} /> : <BackToPage page="groups" />}
         title={props.group.name}

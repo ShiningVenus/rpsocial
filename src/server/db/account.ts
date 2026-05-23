@@ -41,9 +41,9 @@ export function exportAccountData(userId: number) {
   };
 }
 
-function rowsWithComments<T extends { id: number; authorRole?: unknown; ownerRole?: unknown }>(
+function rowsWithComments<T extends { authorSkinHtml?: unknown; id: number; authorRole?: unknown; ownerRole?: unknown }>(
   rows: T[],
-  commentsFor: (id: number) => Array<{ authorRole?: unknown; ownerRole?: unknown }>
+  commentsFor: (id: number) => Array<{ authorSkinHtml?: unknown; authorRole?: unknown; ownerRole?: unknown }>
 ) {
   return exportRows(rows).map((row) => ({
     ...row,
@@ -51,6 +51,6 @@ function rowsWithComments<T extends { id: number; authorRole?: unknown; ownerRol
   }));
 }
 
-function exportRows<T extends { authorRole?: unknown; ownerRole?: unknown }>(rows: T[]) {
-  return rows.map(({ authorRole: _authorRole, ownerRole: _ownerRole, ...exported }) => exported);
+function exportRows<T extends { authorSkinHtml?: unknown; authorRole?: unknown; ownerRole?: unknown }>(rows: T[]) {
+  return rows.map(({ authorRole: _authorRole, authorSkinHtml: _authorSkinHtml, ownerRole: _ownerRole, ...exported }) => exported);
 }

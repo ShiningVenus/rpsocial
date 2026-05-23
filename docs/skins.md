@@ -122,9 +122,31 @@ Shell hooks render only when the profile page has sanitized CSS.
 | `[data-skin-part="custom-html"]` | Sanitized non-style skin HTML. |
 | `[data-skin-part="blog-preview"]` | The latest blog entries panel. |
 | `[data-skin-part="wall"]` | The wall posts panel. |
+| `[data-skin-part="post"]` | A single post card on profile walls and when a profile skin is reused outside that author's profile. |
+| `[data-skin-part="comment"]` | A single author-scoped comment when a profile skin is reused outside that author's profile. |
 | `[data-skin-part="friends"]` | The profile front-row friends panel. |
 
 Conditional hooks only exist when their target content exists.
+
+When posts or comments appear outside an author's own profile, the app may reuse the author's profile skin inside a scoped item boundary.
+
+Scoped author skins render only sanitized CSS; custom skin HTML is not inserted into posts or comments.
+
+Use `[data-skin-part="post"]` to target only the post card element.
+
+Use `[data-skin-part="comment"]` to target only the comment card element.
+
+Existing wall-post descendant rules such as `[data-skin-part="wall"] .post-card` can also style author-scoped posts.
+
+Author-scoped comments also receive post-card skin rules as a low-specificity fallback, so comments match posts by default.
+
+Add `[data-skin-part="comment"]` rules when comments should intentionally differ from posts.
+
+Exact page background declarations fill the viewport-wide post-height backdrop band.
+
+Exact shell, content, and root paint declarations, such as backgrounds, borders, radii, outlines, and shadows, fill matching author-scoped structure layers inside the app container.
+
+Exact page, shell, navigation, footer, content, and wall rules are otherwise treated as profile-page context in author-scoped items. They can pass CSS variables and inherited text or cursor declarations through, but they do not paint page chrome, pseudo-elements, navigation, or footer decorations around feed posts or comments.
 
 The actions panel exposes `.profile-actions`, `.profile-actions__cell`, and `.profile-action` classes inside `[data-skin-part="actions"]`.
 

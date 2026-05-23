@@ -80,6 +80,7 @@ export function CommentList(props: {
             authorHandle={comment.authorHandle}
             className={comment.parentId ? "discussion-entry--reply" : undefined}
             createdAt={comment.createdAt}
+            authorSkinHtml={comment.authorSkinHtml}
             pfp={comment.pfp}
             username={comment.username}
           >

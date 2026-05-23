@@ -19,7 +19,6 @@
   box-shadow: var(--shadow-card);
   display: grid;
   grid-template-columns: var(--discussion-author-width) minmax(0, 1fr);
-  min-height: var(--discussion-min-height);
 }
 
 .discussion-entry--reply {

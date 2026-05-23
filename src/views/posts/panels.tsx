@@ -24,7 +24,14 @@ export function WallBox(props: {
         <PostComposer action={profileWallPath(props.profile)} csrf={props.csrf} button="Post to wall" />
       ) : props.user ? <p><i>Only {props.profile.username}'s friends can post here.</i></p> : <p><a href="/login">Log in</a> to post.</p>}
       {!props.fullWall && props.viewAllHref ? <p>( <a href={props.viewAllHref}>View all</a> )</p> : null}
-      <PostList user={props.user} csrf={props.csrf} posts={props.posts} empty="No posts yet." />
+      <PostList
+        surroundingSkinAuthorId={props.profile.id}
+        user={props.user}
+        csrf={props.csrf}
+        posts={props.posts}
+        empty="No posts yet."
+        authorSkinBackdrop="none"
+      />
       <PaginationNav nextHref={props.nextHref} nextLabel="Older posts" resetHref={props.resetHref} resetLabel="Newest posts" />
     </Panel>
   );
@@ -42,7 +49,7 @@ export function GroupPostBox(props: {
   viewAllHref?: string | null;
 }) {
   return (
-    <Panel className="post-panel" id="group-posts" title="Posts" tone="soft">
+    <Panel className="post-panel post-panel--author-skin-bleed" id="group-posts" title="Posts" tone="soft">
       {props.isMember ? (
         <PostComposer action={`${groupPath(props.group)}/posts`} csrf={props.csrf} button="Post" />
       ) : <p><i>Only group members can post, prop, or comment.</i></p>}

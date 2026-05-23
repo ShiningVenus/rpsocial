@@ -9,11 +9,16 @@ import type { ViewChild } from "../../ui/types.js";
 import { BlogCardList } from "../blogs/index.js";
 import { PostList } from "../posts/index.js";
 import { SkinSummaryCard } from "../skins/index.js";
+import { AuthorSkinStyles } from "../../skins/rendering.js";
 
 export function SearchPage(props: { user: CurrentUser | null; csrf: string; query: string; results: SiteSearchResults | null }) {
   const hasResults = props.results ? hasSearchResults(props.results) : false;
   return (
-    <Layout title={props.query ? `Search: ${props.query}` : "Search"} user={props.user}>
+    <Layout
+      title={props.query ? `Search: ${props.query}` : "Search"}
+      user={props.user}
+      head={props.results ? <AuthorSkinStyles items={props.results.posts} /> : null}
+    >
       <PageFrame title={props.query ? `Search: ${props.query}` : "Search"}>
         <form class="search-form" method="get" action="/search">
           <input type="text" name="q" value={props.query} maxLength={limits.searchQuery} autocomplete="off" aria-label="Search" />

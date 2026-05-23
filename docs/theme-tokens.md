@@ -399,7 +399,6 @@ Layout and size tokens:
 --person-card-width
 --person-card-min-height
 --profile-person-card-width
---discussion-min-height
 --details-label-width
 --discussion-author-width
 --column-compact

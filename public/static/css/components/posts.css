@@ -2,6 +2,10 @@
   margin: 0;
 }
 
+.post-panel--author-skin-bleed {
+  overflow: visible;
+}
+
 .composer {
   background: var(--surface-background-raised);
   border: var(--border-thin) solid var(--surface-border);
@@ -58,6 +62,14 @@
 
 .post-list > * {
   margin-block: 0;
+}
+
+.post-list:has(> [data-author-skin-backdrop="container"]) {
+  gap: 0;
+}
+
+.post-list:has(> [data-author-skin-backdrop="container"]) > .post-card + .post-card {
+  margin-top: var(--list-stack-gap);
 }
 
 .post-card {

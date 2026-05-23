@@ -1,4 +1,22 @@
-[data-skin-page] {
+[data-author-skin-page] {
+  --skin-palette-accent: initial;
+  --skin-palette-accent-text: initial;
+  --skin-palette-backdrop: initial;
+  --skin-palette-chrome: initial;
+  --skin-palette-chrome-text: initial;
+  --skin-palette-focus: initial;
+  --skin-palette-link: initial;
+  --skin-palette-link-hover: initial;
+  --skin-palette-muted: initial;
+  --skin-palette-page: initial;
+  --skin-palette-page-text: initial;
+  --skin-palette-surface: initial;
+  --skin-palette-surface-link-hover: initial;
+  --skin-palette-surface-text: initial;
+}
+
+[data-skin-page],
+[data-author-skin-page] {
   --skin-accent: var(--skin-palette-accent, var(--app-theme-accent));
   --skin-accent-text: var(--skin-palette-accent-text, var(--app-theme-accent-text));
   --skin-backdrop: var(--skin-palette-backdrop, var(--app-theme-backdrop));
@@ -39,6 +57,193 @@
   --radius-media: var(--skin-radius-photo);
   --radius-subtle: var(--skin-radius-control);
   accent-color: var(--theme-accent);
+}
+
+:where([data-author-skin-layer="page"]) {
+  --author-skin-backdrop-inline-size: 100vw;
+  --author-skin-backdrop-padding: 0px;
+  --author-skin-shell-inline-size: min(100vw, var(--container-width));
+  --author-skin-container-inline-size: max(
+    0px,
+    calc(var(--author-skin-shell-inline-size) - var(--border-thin) - var(--border-thin))
+  );
+  --author-skin-item-inline-size: 100%;
+
+  border: 0;
+  border-radius: var(--radius-panel);
+  box-shadow: none;
+  background-color: var(--color-page);
+  background-image: var(--page-background);
+  color: var(--color-text);
+  display: grid;
+  inline-size: 100%;
+  isolation: isolate;
+  margin: 0;
+  max-inline-size: 100%;
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+}
+
+:where([data-author-skin-backdrop="item"]) {
+  --author-skin-backdrop-padding: var(--space-5);
+}
+
+:where([data-author-skin-backdrop="none"]) {
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+}
+
+:where([data-author-skin-backdrop="container"]) {
+  inline-size: var(--author-skin-backdrop-inline-size);
+  margin-inline: calc((100% - var(--author-skin-backdrop-inline-size)) / 2);
+  max-inline-size: var(--author-skin-backdrop-inline-size);
+}
+
+:where(
+  [data-author-skin-layer="backdrop"],
+  [data-author-skin-layer="shell"],
+  [data-author-skin-layer="content"],
+  [data-author-skin-layer="root"]
+) {
+  block-size: auto;
+  display: block;
+  inline-size: auto;
+  inset: 0 !important;
+  margin: 0;
+  max-block-size: none;
+  max-inline-size: none;
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  padding: 0;
+  pointer-events: none !important;
+  position: absolute !important;
+}
+
+:where([data-author-skin-layer="backdrop"]) {
+  background-color: var(--color-page);
+  background-image: var(--page-background);
+  z-index: 0;
+}
+
+:where([data-author-skin-layer="shell"]) {
+  border-left: var(--border-thin) solid var(--color-container-border);
+  border-right: var(--border-thin) solid var(--color-container-border);
+  background: var(--color-canvas);
+  z-index: 1;
+}
+
+:where([data-author-skin-layer="content"]) {
+  background: var(--color-canvas);
+  z-index: 2;
+}
+
+:where([data-author-skin-layer="root"]) {
+  z-index: 3;
+}
+
+:where(
+  [data-author-skin-backdrop="none"] > [data-author-skin-layer="backdrop"],
+  [data-author-skin-backdrop="none"] > [data-author-skin-layer="shell"],
+  [data-author-skin-backdrop="none"] > [data-author-skin-layer="content"],
+  [data-author-skin-backdrop="none"] > [data-author-skin-layer="root"]
+) {
+  display: none;
+}
+
+:where([data-author-skin-backdrop="container"] > [data-author-skin-layer="shell"]) {
+  inline-size: var(--author-skin-shell-inline-size);
+  inset-inline: calc((100% - var(--author-skin-shell-inline-size)) / 2) !important;
+}
+
+:where(
+  [data-author-skin-backdrop="container"] > [data-author-skin-layer="content"],
+  [data-author-skin-backdrop="container"] > [data-author-skin-layer="root"]
+) {
+  inline-size: var(--author-skin-container-inline-size);
+  inset-inline: calc((100% - var(--author-skin-container-inline-size)) / 2) !important;
+}
+
+:where([data-author-skin-layer="foreground"]) {
+  display: grid;
+  inline-size: 100%;
+  justify-items: stretch;
+  min-block-size: 0;
+  min-inline-size: 0;
+  pointer-events: none;
+  position: relative;
+  z-index: 4;
+}
+
+:where([data-author-skin-backdrop="item"], [data-author-skin-backdrop="container"]) :where([data-author-skin-layer="foreground"]) {
+  padding: var(--author-skin-backdrop-padding);
+}
+
+:where([data-author-skin-backdrop="container"]) :where([data-author-skin-layer="foreground"]) {
+  justify-items: center;
+}
+
+:where([data-author-skin-backdrop="none"] > [data-author-skin-layer="foreground"]) {
+  pointer-events: auto !important;
+}
+
+[data-author-skin-frame="profile-measure"] {
+  display: grid;
+  inline-size: var(--author-skin-container-inline-size);
+  justify-items: center;
+  max-inline-size: 100%;
+  width: var(--author-skin-container-inline-size);
+}
+
+[data-author-skin-frame="main"] {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  width: 100%;
+}
+
+:where([data-author-skin-frame="wall-body"]) {
+  align-content: start;
+  display: grid;
+  gap: var(--panel-body-gap);
+  min-inline-size: 0;
+  padding: var(--space-4);
+}
+
+:where([data-author-skin-frame="wall-body"] > *) {
+  margin-block: 0;
+}
+
+:where([data-author-skin-backdrop="item"], [data-author-skin-backdrop="container"]) :where([data-author-skin-part="post"], [data-author-skin-part="comment"]) {
+  inline-size: var(--author-skin-item-inline-size);
+  max-inline-size: 100%;
+}
+
+:where([data-author-skin-part="post"], [data-author-skin-part="comment"]) {
+  pointer-events: auto !important;
+}
+
+:where([data-author-skin-part="post"], [data-author-skin-part="comment"]) :where(*) {
+  pointer-events: auto !important;
+}
+
+:where([data-author-skin-wrapper]) {
+  display: contents !important;
+}
+
+:where([data-author-skin-scope] [data-author-skin-part="comment"] .discussion-entry__author,
+[data-author-skin-scope] [data-author-skin-part="comment"] .discussion-entry__body) {
+  background: transparent;
+}
+
+@media (min-width: 48em) {
+  [data-author-skin-frame="main"] {
+    inline-size: calc(100% - max(var(--profile-sidebar-min), var(--column-profile)));
+    width: calc(100% - max(var(--profile-sidebar-min), var(--column-profile)));
+  }
 }
 
 .profile h1 {

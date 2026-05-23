@@ -49,6 +49,10 @@
   margin: 0;
 }
 
+.action-bar__primary :where(button, .button) {
+  --button-hover-text: var(--color-link-hover);
+}
+
 .action-bar__secondary button,
 .action-bar__secondary .button {
   min-height: auto;

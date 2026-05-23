@@ -4,6 +4,13 @@ import { Icon } from "./icons.js";
 import { profileImagePath } from "../paths.js";
 
 type ProfileImageVariant = "avatar-compact" | "profile" | "edit-preview";
+type ProfileImageProps = {
+  filename: string;
+  alt?: string;
+  className?: string;
+  variant?: ProfileImageVariant;
+  loading?: "lazy" | "eager";
+};
 
 const profileImageVariants: Record<ProfileImageVariant, string> = {
   "avatar-compact": "profile-image--avatar-compact",
@@ -11,7 +18,7 @@ const profileImageVariants: Record<ProfileImageVariant, string> = {
   "edit-preview": "profile-image--edit-preview"
 };
 
-export function ProfileImage(props: { filename: string; alt?: string; className?: string; variant?: ProfileImageVariant; loading?: "lazy" | "eager" }) {
+export function ProfileImage(props: ProfileImageProps) {
   const alt = props.alt ?? "profile picture";
   const variantClass = props.variant ? profileImageVariants[props.variant] : undefined;
   const classes = classNames(variantClass, props.className);
@@ -23,4 +30,13 @@ export function ProfileImage(props: { filename: string; alt?: string; className?
     );
   }
   return <img class={classes} src={profileImagePath(props.filename)} alt={alt} loading={props.loading} />;
+}
+
+export function ProfileImageLink(props: ProfileImageProps & { href: string; label: string; linkClassName?: string }) {
+  const { href, label, linkClassName, ...imageProps } = props;
+  return (
+    <a class={classNames("profile-image-link", linkClassName)} href={href} aria-label={label}>
+      <ProfileImage {...imageProps} />
+    </a>
+  );
 }

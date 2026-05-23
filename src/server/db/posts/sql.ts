@@ -9,7 +9,7 @@ type PostRowsOptions = {
 
 const postColumns = (propVisibilitySql: string, commentVisibilitySql: string, parentCommentVisibilitySql: string) => `po.id, po.body_html AS bodyHtml, po.media_filename AS mediaFilename,
   po.created_at AS createdAt, po.updated_at AS updatedAt,
-  author.id AS authorId, author.role AS authorRole, authorProfile.handle AS authorHandle, author.username, authorProfile.pfp,
+  author.id AS authorId, author.role AS authorRole, authorProfile.handle AS authorHandle, authorProfile.skin_html AS authorSkinHtml, author.username, authorProfile.pfp,
   u.id AS wallUserId, p.handle AS wallUserHandle, u.username AS wallUsername,
   g.id AS groupId, g.name AS groupName, g.owner_id AS groupOwnerId,
   (

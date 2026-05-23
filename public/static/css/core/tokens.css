@@ -76,7 +76,6 @@
   --person-card-width: var(--avatar-size);
   --person-card-min-height: 100px;
   --profile-person-card-width: 105px;
-  --discussion-min-height: 112px;
   --details-label-width: 33%;
   --discussion-author-width: calc(var(--avatar-compact-size) + var(--space-12));
   --column-compact: 20%;
@@ -137,7 +136,8 @@
 }
 
 :root,
-[data-skin-page] {
+[data-skin-page],
+[data-author-skin-page] {
   /* Shared resolver: admin themes and profile skins both feed --theme-* here. */
   --color-page: var(--theme-backdrop);
   --color-canvas: var(--theme-page);

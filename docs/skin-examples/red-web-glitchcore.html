@@ -33,36 +33,36 @@ https://layouts.spacehey.com/layout?id=23505
   --skin-palette-muted: #72878c;
   --skin-palette-page: rgba(0,0,0,0.49);
   --skin-palette-page-text: #ff6868;
-  --skin-palette-surface: rgba(0,0,0,0.87);
+  --skin-palette-surface: rgba(0,0,0,0.22);
   --skin-palette-surface-text: #72878c;
   background:
     linear-gradient(rgba(82,15,15,0.48) 50%, rgba(0,0,0,0) 50%),
     url("https://i.pinimg.com/originals/b7/9a/f5/b79af5850ce890e052487cc88ab91251.gif");
   background-size: 100% 2px, auto;
-  cursor: url("https://64.media.tumblr.com/d4a50c1b4d90a1eccf75ccca47199961/b261dfe74ba3f797-4e/s250x250_c1/b8ad33e140c516f3c0960a2572806ef066ef50d0.gifv"), auto;
+  cursor: url("https://64.media.tumblr.com/d4a50c1b4d90a1eccf75ccca47199961/b261dfe74ba3f797-4e/s250x250_c1/b8ad33e140c516f3c0960a2572806ef066ef50d0.gifv") 31 31, auto;
 }
 
 [data-skin-root],
 [data-skin-root] * {
-  cursor: url("https://64.media.tumblr.com/d4a50c1b4d90a1eccf75ccca47199961/b261dfe74ba3f797-4e/s250x250_c1/b8ad33e140c516f3c0960a2572806ef066ef50d0.gifv"), auto;
+  cursor: url("https://64.media.tumblr.com/d4a50c1b4d90a1eccf75ccca47199961/b261dfe74ba3f797-4e/s250x250_c1/b8ad33e140c516f3c0960a2572806ef066ef50d0.gifv") 31 31, auto;
   font-family: monospace;
 }
 
 [data-skin-root] {
   animation: float 3s infinite ease-in-out;
-  background: rgba(0,0,0,0.49);
+  background: rgba(0,0,0,0.18);
   border: 3px solid #bc1419;
   color: #ff6868;
 }
 
 [data-skin-part="shell"] {
   background:
-    linear-gradient(rgba(0,0,0,0.56), rgba(0,0,0,0.56)),
+    linear-gradient(rgba(0,0,0,0.24), rgba(0,0,0,0.24)),
     url("https://i.pinimg.com/originals/b7/9a/f5/b79af5850ce890e052487cc88ab91251.gif") center / auto repeat !important;
 }
 
 [data-skin-part="content"] {
-  background: rgba(0,0,0,0.42) !important;
+  background: rgba(0,0,0,0.16) !important;
 }
 
 [data-skin-part="navigation-top"] {
@@ -111,8 +111,13 @@ https://layouts.spacehey.com/layout?id=23505
 [data-skin-part="url"],
 [data-skin-part="links"],
 [data-skin-part="interests"] {
-  background: url("https://i.pinimg.com/originals/d1/ad/53/d1ad535a0ff589ee8668e354a72a836b.gif") center / cover #120000 !important;
-  background-blend-mode: color;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(18,0,0,0.22) 0%,
+      rgba(18,0,0,0.14) 58%,
+      rgba(18,0,0,0.08) 100%
+    ) !important;
   border: 9px double #000 !important;
   border-radius: 0 !important;
 }
@@ -126,10 +131,15 @@ https://layouts.spacehey.com/layout?id=23505
 }
 
 [data-skin-root] .panel__body {
-  background: url("https://i.pinimg.com/originals/a1/7e/d0/a17ed0a1a3ea7e59b8077d4fb9e3d352.gif") #000 !important;
-  background-blend-mode: color;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,0.18) 0%,
+      rgba(0,0,0,0.1) 52%,
+      rgba(0,0,0,0.04) 100%
+    ) !important;
   border: 6px double #000;
-  box-shadow: 5px 8px #ba0000 !important;
+  box-shadow: 5px 8px rgba(186,0,0,0.24) !important;
   color: #72878c;
 }
 

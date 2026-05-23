@@ -47,7 +47,7 @@ type CommentListOptions = {
 };
 
 const commentColumns = `c.id, c.text_html AS textHtml, c.created_at AS createdAt, c.parent_id AS parentId,
-  u.id AS authorId, u.role AS authorRole, p.handle AS authorHandle, u.username, p.pfp`;
+  u.id AS authorId, u.role AS authorRole, p.handle AS authorHandle, p.skin_html AS authorSkinHtml, u.username, p.pfp`;
 const commentAuthorJoin = `JOIN users u ON u.id = c.author_id
   JOIN profiles p ON p.user_id = u.id`;
 

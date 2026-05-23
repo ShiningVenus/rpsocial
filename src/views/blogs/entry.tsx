@@ -12,6 +12,7 @@ import { blogCommentsPath, blogPath, profileBlogPath, profilePath, reportPath } 
 import { absoluteUrl } from "../../server/indexing/urls.js";
 import { plainTextFromHtml } from "../../server/security/html.js";
 import { seoText, type PageSeo } from "../../settings/seo.js";
+import { AuthorSkinStyles } from "../../skins/rendering.js";
 import { Layout, SplitLayout, SplitPane } from "../../shell/index.js";
 
 export function BlogEntryPage(props: {
@@ -43,7 +44,7 @@ export function BlogEntryPage(props: {
     </>
   ) : null;
   return (
-    <Layout title={props.blog.title} user={props.user} seo={blogSeo(props.blog)}>
+    <Layout title={props.blog.title} user={props.user} head={<AuthorSkinStyles items={props.comments} />} seo={blogSeo(props.blog)}>
       <SplitLayout variant="article" itemscope itemtype="http://schema.org/Article">
         <SplitPane area="aside">
           <div class="context-card">
