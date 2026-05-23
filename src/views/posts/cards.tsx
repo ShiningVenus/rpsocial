@@ -9,30 +9,28 @@ import { PropAction, PropCount } from "../../ui/engagement.js";
 import { CsrfInput } from "../../ui/forms.js";
 import { MetaSubjectLink } from "../../ui/meta.js";
 import { ProfileImageLink } from "../../ui/avatars.js";
-import { AuthorSkinBoundary, type AuthorSkinBackdropMode, profileSkinPart } from "../../skins/rendering.js";
+import { AuthorSkinBoundary, profileSkinPart } from "../../skins/rendering.js";
 import { groupPath, postImagePath, postPath, profilePath, reportPath } from "../../paths.js";
 import { LocalizedTime } from "../../ui/time.js";
 
 export function PostList(props: {
-  surroundingSkinAuthorId?: number;
+  authorSkins?: boolean;
   user: CurrentUser | null;
   csrf: string;
   posts: PostItem[];
   empty: string;
   canInteract?: boolean;
-  authorSkinBackdrop?: AuthorSkinBackdropMode;
 }) {
   return (
     <div class="post-list">
       {props.posts.length ? props.posts.map((post) => (
         <PostCard
           key={post.id}
-          surroundingSkinAuthorId={props.surroundingSkinAuthorId}
+          authorSkins={props.authorSkins}
           user={props.user}
           csrf={props.csrf}
           post={post}
           canInteract={postCanInteract(post, props.canInteract)}
-          authorSkinBackdrop={props.authorSkinBackdrop}
         />
       )) : <p><i>{props.empty}</i></p>}
     </div>
@@ -40,18 +38,17 @@ export function PostList(props: {
 }
 
 export function PostCard(props: {
-  surroundingSkinAuthorId?: number;
+  authorSkins?: boolean;
   user: CurrentUser | null;
   csrf: string;
   post: PostItem;
   canInteract?: boolean;
-  authorSkinBackdrop?: AuthorSkinBackdropMode;
 }) {
   const post = props.post;
   const canDelete = canDeletePost(props.user, post);
   const canInteract = props.canInteract ?? Boolean(post.viewerCanInteract);
   const href = postPath(post);
-  const authorSkinHtml = post.authorId === props.surroundingSkinAuthorId ? null : post.authorSkinHtml;
+  const authorSkinHtml = props.authorSkins === false ? null : post.authorSkinHtml;
   const engagementActions = (
     <>
       {props.user && canInteract ? (
@@ -79,7 +76,7 @@ export function PostCard(props: {
     </>
   );
   return (
-    <AuthorSkinBoundary skinHtml={authorSkinHtml} contextParts={["wall"]} backdrop={props.authorSkinBackdrop ?? "container"}>
+    <AuthorSkinBoundary skinHtml={authorSkinHtml} contextParts={["wall"]} backdrop="container">
       <article id={anchors.post(post)} class="post-card" data-author-skin-part="post" {...profileSkinPart("post")}>
         <CommentBumpLabel post={post} href={href} />
         <div class="post-card__header">

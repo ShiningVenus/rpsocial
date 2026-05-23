@@ -26,12 +26,11 @@ export function WallBox(props: {
       ) : props.user ? <p><i>Only {props.profile.username}'s friends can post here.</i></p> : <p><a href="/login">Log in</a> to post.</p>}
       {!props.fullWall && props.viewAllHref ? <p>( <a href={props.viewAllHref}>View all</a> )</p> : null}
       <PostList
-        surroundingSkinAuthorId={props.profile.id}
+        authorSkins={false}
         user={props.user}
         csrf={props.csrf}
         posts={props.posts}
         empty="No posts yet."
-        authorSkinBackdrop="none"
       />
       <PaginationNav nextHref={props.nextHref} nextLabel="Older posts" resetHref={props.resetHref} resetLabel="Newest posts" />
     </Panel>

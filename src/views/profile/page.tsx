@@ -5,7 +5,7 @@ import { absoluteUrl } from "../../server/indexing/urls.js";
 import { plainTextFromHtml } from "../../server/security/html.js";
 import { seoText, type PageSeo } from "../../settings/seo.js";
 import { skinBrowserThemeColorFromHtml } from "../../skins/colorPalette.js";
-import { AuthorSkinStyles, profileSkinFromHtml, profileSkinPageAttributes, ProfileSkinStyles } from "../../skins/rendering.js";
+import { profileSkinFromHtml, profileSkinPageAttributes, ProfileSkinStyles } from "../../skins/rendering.js";
 import { ProfileLayout } from "./layout.js";
 import type { ProfilePageProps } from "./pageProps.js";
 
@@ -17,7 +17,7 @@ export function ProfilePage(props: ProfilePageProps) {
       user={props.user}
       bodyAttributes={profileSkinPageAttributes(skin)}
       browserThemeColor={(branding) => skinBrowserThemeColorFromHtml(skin.styleHtml, branding.palette)}
-      head={<><ProfileSkinStyles skin={skin} /><AuthorSkinStyles surroundingSkinAuthorId={props.profile.id} items={props.wallPosts} /></>}
+      head={<ProfileSkinStyles skin={skin} />}
       seo={profileSeo(props)}
     >
       <ProfileLayout {...props} skin={skin} />

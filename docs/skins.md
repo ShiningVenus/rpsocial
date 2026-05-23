@@ -132,6 +132,8 @@ When posts or comments appear outside an author's own profile, the app may reuse
 
 Scoped author skins render only sanitized CSS; custom skin HTML is not inserted into posts or comments.
 
+Profile wall posts stay inside the profile owner's page skin. They are not re-skinned by each post author's profile skin.
+
 Use `[data-skin-part="post"]` to target only the post card element.
 
 Use `[data-skin-part="comment"]` to target only the comment card element.

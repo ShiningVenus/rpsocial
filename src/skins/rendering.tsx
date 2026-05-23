@@ -141,8 +141,8 @@ export function ProfileSkinStyles({ skin }: { skin: ProfileSkin }) {
   return skin.styleHtml ? <>{raw(layerProfileSkinStyleHtml(skin.styleHtml))}</> : null;
 }
 
-export function AuthorSkinStyles(props: { surroundingSkinAuthorId?: number; items: readonly AuthorSkinItem[] }) {
-  const styles = authorSkinStyleHtmlForItems(props.items, props.surroundingSkinAuthorId);
+export function AuthorSkinStyles(props: { items: readonly AuthorSkinItem[] }) {
+  const styles = authorSkinStyleHtmlForItems(props.items);
   return styles ? <>{raw(styles)}</> : null;
 }
 
@@ -186,10 +186,9 @@ export function AuthorSkinBoundary(props: {
   );
 }
 
-function authorSkinStyleHtmlForItems(items: readonly AuthorSkinItem[], surroundingSkinAuthorId?: number) {
+function authorSkinStyleHtmlForItems(items: readonly AuthorSkinItem[]) {
   const scopes = new Map<string, AuthorSkinScope>();
   for (const item of items) {
-    if (item.authorId === surroundingSkinAuthorId) continue;
     const scope = authorSkinScopeFromHtml(item.authorSkinHtml);
     if (scope && !scopes.has(scope.id)) scopes.set(scope.id, scope);
   }
