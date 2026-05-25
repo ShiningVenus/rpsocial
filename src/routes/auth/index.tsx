@@ -20,7 +20,7 @@ import { field } from "../../server/forms.js";
 import { badFormRequestMessage, verifiedActionForm, verifiedForm } from "../../server/http.js";
 import { env } from "../../server/env.js";
 import { smtpConfigured } from "../../server/email/smtp.js";
-import { canonicalEmail, characterRangeLabel, limits, minimumCharacterLabel, validEmail, validHandle, validUsername } from "../../policy.js";
+import { canonicalEmail, characterRangeLabel, limits, validEmail, validHandle, validPassword, validUsername } from "../../policy.js";
 import type { CurrentUser } from "../../currentUser.js";
 import type { AppBindings, AppContext } from "../../server/context.js";
 import { LogoutPage, ResetApplyPage, ResetRequestPage, ResetUnavailablePage, SignUpPage, VerifyPage } from "../../views/auth/index.js";
@@ -36,7 +36,7 @@ export function registerAuthRoutes(app: Hono<AppBindings>) {
     const email = field(form, "email").toLowerCase();
     const password = field(form, "password");
     const user = getUserByEmail(email);
-    if (!user || user.bannedAt || !(await verifyPassword(user.passwordHash, password))) {
+    if (!user || user.bannedAt || password.length > limits.passwordMax || !(await verifyPassword(user.passwordHash, password))) {
       return landingPage(c, viewer, "Email or password is incorrect.", 400);
     }
     createSession(c, user.id);
@@ -99,8 +99,16 @@ export function registerAuthRoutes(app: Hono<AppBindings>) {
     const user = currentUser(c);
     const token = c.req.param("token");
     const password = field(form, "password");
-    if (password.length < limits.passwordMin || password !== field(form, "confirm")) {
-      return c.html(<ResetApplyPage user={user} csrf={csrfToken(c)} token={token} message={`Passwords must match and be ${minimumCharacterLabel(limits.passwordMin)}.`} />, 400);
+    if (!validPassword(password) || password !== field(form, "confirm")) {
+      return c.html(
+        <ResetApplyPage
+          user={user}
+          csrf={csrfToken(c)}
+          token={token}
+          message={`Passwords must match and be ${characterRangeLabel(limits.passwordMin, limits.passwordMax)}.`}
+        />,
+        400
+      );
     }
     const userId = consumeResetToken(token);
     if (!userId) return c.html(<ResetApplyPage user={user} csrf={csrfToken(c)} token={token} message="This reset link is invalid or expired." />, 400);
@@ -161,13 +169,13 @@ async function signupFromForm(form: Record<string, unknown>): Promise<SignupResu
   if (field(form, "terms") !== "accepted") {
     return signupError(email, handle, "You must be 13+ and agree to the terms, privacy, and rules to sign up.");
   }
-  if (!validUsername(username) || !validHandle(handle) || !validEmail(email) || password.length < limits.passwordMin || password !== field(form, "confirm")) {
+  if (!validUsername(username) || !validHandle(handle) || !validEmail(email) || !validPassword(password) || password !== field(form, "confirm")) {
     return signupError(
       email,
       handle,
       `Use a display name with ${characterRangeLabel(limits.usernameMin, limits.usernameMax)}, ` +
         `a handle with ${characterRangeLabel(limits.handleMin, limits.handleMax)}, ` +
-        `a valid email, and matching passwords of ${minimumCharacterLabel(limits.passwordMin)}.`
+        `a valid email, and matching passwords of ${characterRangeLabel(limits.passwordMin, limits.passwordMax)}.`
     );
   }
   if (getUserByEmail(email)) return signupError(email, handle, "That email is already in use.");

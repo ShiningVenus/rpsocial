@@ -44,7 +44,7 @@ export function LandingPage(props: {
                 <input type="email" name="email" autocomplete="email" required maxLength={limits.emailMax} />
               </FormField>
               <FormField label="Password:">
-                <input name="password" type="password" autocomplete="current-password" required />
+                <input name="password" type="password" autocomplete="current-password" required maxLength={limits.passwordMax} />
               </FormField>
               <FormActions>
                 <button type="submit">Log in</button>

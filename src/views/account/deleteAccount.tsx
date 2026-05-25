@@ -1,4 +1,5 @@
 import type { CurrentUser } from "../../currentUser.js";
+import { limits } from "../../policy.js";
 import { ActionLabel } from "../../ui/actions.js";
 import { CsrfInput, FormActions, FormError, FormField, FormStack } from "../../ui/forms.js";
 import { BackToPage } from "../../ui/links.js";
@@ -12,7 +13,7 @@ export function DeleteAccountPage(props: { user: CurrentUser; csrf: string; mess
         <FormStack action="/account/delete">
           <CsrfInput csrf={props.csrf} />
           <FormField label="Password">
-            <input type="password" name="password" required autocomplete="current-password" />
+            <input type="password" name="password" required autocomplete="current-password" maxLength={limits.passwordMax} />
           </FormField>
           <FormField label="Type DELETE">
             <input type="text" name="confirm" required autocomplete="off" />

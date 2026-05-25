@@ -98,13 +98,13 @@ function PasswordPanel() {
     <Panel title="Change password">
       <div class="form-stack">
         <FormField label="Old password">
-          <input type="password" name="password-old" autocomplete="current-password" />
+          <input type="password" name="password-old" autocomplete="current-password" maxLength={limits.passwordMax} />
         </FormField>
         <FormField label="New password">
-          <input type="password" name="password-new" autocomplete="new-password" minLength={limits.passwordMin} />
+          <input type="password" name="password-new" autocomplete="new-password" minLength={limits.passwordMin} maxLength={limits.passwordMax} />
         </FormField>
         <FormField label="Confirm new password">
-          <input type="password" name="password-confirm" autocomplete="new-password" minLength={limits.passwordMin} />
+          <input type="password" name="password-confirm" autocomplete="new-password" minLength={limits.passwordMin} maxLength={limits.passwordMax} />
         </FormField>
       </div>
     </Panel>

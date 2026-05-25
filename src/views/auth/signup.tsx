@@ -29,10 +29,10 @@ export function SignUpPage(props: { user: CurrentUser | null; csrf: string; init
             <input required placeholder="Email" type="email" name="email" autocomplete="email" maxLength={limits.emailMax} value={props.initialEmail ?? ""} />
           </FormField>
           <FormField label="Password">
-            <input required placeholder="Password" type="password" name="password" autocomplete="new-password" minLength={limits.passwordMin} />
+            <input required placeholder="Password" type="password" name="password" autocomplete="new-password" minLength={limits.passwordMin} maxLength={limits.passwordMax} />
           </FormField>
           <FormField label="Confirm password">
-            <input required placeholder="Confirm password" type="password" name="confirm" autocomplete="new-password" minLength={limits.passwordMin} />
+            <input required placeholder="Confirm password" type="password" name="confirm" autocomplete="new-password" minLength={limits.passwordMin} maxLength={limits.passwordMax} />
           </FormField>
           <div class="form-checks signup-terms">
             <label>

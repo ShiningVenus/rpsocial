@@ -40,6 +40,7 @@ export const limits = {
   requestBytes: 12 * 1024 * 1024,
   uploadBytes: 10 * 1024 * 1024,
   passwordMin: 8,
+  passwordMax: 256,
   usernameMin: 2,
   usernameMax: 50,
   handleMin: 3,
@@ -55,7 +56,7 @@ export const limits = {
   searchResults: 10,
   socialLinkUrl: 200,
   groupText: 500,
-  postText: 1000,
+  postText: 2000,
   interest: 500,
   userText: 2000,
   skinHtml: 20000,
@@ -194,6 +195,10 @@ export function isReportSubjectType(value: string): value is ReportSubjectType {
 
 export function validUsername(value: string) {
   return value.length >= limits.usernameMin && value.length <= limits.usernameMax;
+}
+
+export function validPassword(value: string) {
+  return value.length >= limits.passwordMin && value.length <= limits.passwordMax;
 }
 
 export function validEmail(value: string) {

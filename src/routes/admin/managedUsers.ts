@@ -6,7 +6,7 @@ import { requestPasswordReset } from "../../server/db/email.js";
 import { markUserVerified, setUserBanned, setUserRole, updatePassword } from "../../server/db/users.js";
 import { field } from "../../server/forms.js";
 import { formAction } from "../../server/http.js";
-import { limits } from "../../policy.js";
+import { characterRangeLabel, limits, validPassword } from "../../policy.js";
 import { isUserRole, type UserRole } from "../../roles.js";
 import type { CurrentUser } from "../../currentUser.js";
 
@@ -34,7 +34,7 @@ const managedUserActions = {
   },
   password: async ({ form, target }: ManagedUserActionInput) => {
     const password = field(form, "password");
-    if (password.length < limits.passwordMin) throw new HTTPException(400, { message: "Password is too short." });
+    if (!validPassword(password)) throw new HTTPException(400, { message: `Password must be ${characterRangeLabel(limits.passwordMin, limits.passwordMax)}.` });
     updatePassword(target.id, await hashPassword(password));
     revokeUserSessions(target.id);
   }

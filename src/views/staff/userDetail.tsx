@@ -31,7 +31,7 @@ export function StaffUserDetailPage(props: { user: CurrentUser; csrf: string; ta
               <button name="action" value="role" type="submit">Set role</button>
             </FormActions>
             <FormField label="New password">
-              <input type="password" name="password" placeholder="New password" minLength={limits.passwordMin} />
+              <input type="password" name="password" placeholder="New password" minLength={limits.passwordMin} maxLength={limits.passwordMax} />
             </FormField>
             <FormActions>
               <button name="action" value="password" type="submit">Change password</button>

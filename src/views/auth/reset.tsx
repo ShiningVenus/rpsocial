@@ -40,10 +40,10 @@ export function ResetApplyPage(props: { user: CurrentUser | null; csrf: string; 
         <FormStack action={`/reset/${props.token}`}>
           <CsrfInput csrf={props.csrf} />
           <FormField label="New password">
-            <input type="password" name="password" required minLength={limits.passwordMin} autocomplete="new-password" />
+            <input type="password" name="password" required minLength={limits.passwordMin} maxLength={limits.passwordMax} autocomplete="new-password" />
           </FormField>
           <FormField label="Confirm password">
-            <input type="password" name="confirm" required minLength={limits.passwordMin} autocomplete="new-password" />
+            <input type="password" name="confirm" required minLength={limits.passwordMin} maxLength={limits.passwordMax} autocomplete="new-password" />
           </FormField>
           <FormActions>
             <button type="submit">Change password</button>

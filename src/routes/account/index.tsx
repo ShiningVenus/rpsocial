@@ -18,7 +18,7 @@ import { deleteAccount, getUserByEmail, updateEmail, updatePassword, updateProfi
 import { field } from "../../server/forms.js";
 import { formId, localBack, verifiedActionForm } from "../../server/http.js";
 import { deletePostImages, deleteProfileImage, deleteProfileThemeSong } from "../../server/media/upload.js";
-import { limits, minimumCharacterLabel, validEmail } from "../../policy.js";
+import { characterRangeLabel, limits, validEmail, validPassword } from "../../policy.js";
 import { isSupportedTimeZone } from "../../timeZones.js";
 import { notificationPreferenceTypeNames, type NotificationPreferences } from "../../notifications.js";
 import type { CurrentUser } from "../../currentUser.js";
@@ -94,7 +94,8 @@ export function registerAccountRoutes(app: Hono<AppBindings>) {
     const user = requireAuth(c);
     const form = await verifiedActionForm(c, "account.write");
     const current = getUserByEmail(user.email);
-    if (!current || !(await verifyPassword(current.passwordHash, field(form, "password")))) {
+    const password = field(form, "password");
+    if (!current || password.length > limits.passwordMax || !(await verifyPassword(current.passwordHash, password))) {
       return c.html(<DeleteAccountPage user={user} csrf={csrfToken(c)} message="Password is incorrect." />, 400);
     }
     if (field(form, "confirm") !== "DELETE") {
@@ -136,11 +137,12 @@ async function settingsUpdateFromForm(user: CurrentUser, form: Record<string, un
   const timeZone = field(form, "time_zone");
 
   if (password) {
-    const current = getUserByEmail(user.email);
-    if (!current || !(await verifyPassword(current.passwordHash, field(form, "password-old")))) return settingsError("Old password is incorrect.", notificationPreferences);
-    if (password.length < limits.passwordMin || password !== field(form, "password-confirm")) {
-      return settingsError(`New passwords must match and be ${minimumCharacterLabel(limits.passwordMin)}.`, notificationPreferences);
+    if (!validPassword(password) || password !== field(form, "password-confirm")) {
+      return settingsError(`New passwords must match and be ${characterRangeLabel(limits.passwordMin, limits.passwordMax)}.`, notificationPreferences);
     }
+    const current = getUserByEmail(user.email);
+    const oldPassword = field(form, "password-old");
+    if (!current || oldPassword.length > limits.passwordMax || !(await verifyPassword(current.passwordHash, oldPassword))) return settingsError("Old password is incorrect.", notificationPreferences);
   }
   if (!email) return settingsError("Email is required.", notificationPreferences);
   if (email !== user.email) {
