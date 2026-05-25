@@ -1,0 +1,50 @@
+{
+  "name": "bliishspace",
+  "version": "0.0.0",
+  "description": "Lightweight, lightning-fast, open-source private social media you can self-host and customize, with no tracking",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bliish-com/bliishspace.git"
+  },
+  "homepage": "https://github.com/bliish-com/bliishspace",
+  "author": {
+    "name": "Bliish",
+    "url": "https://bliish.com"
+  },
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.1.3",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.tsx",
+    "start": "node dist/index.js",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "assets:brand": "tsx src/scripts/generateBrandAssets.ts",
+    "assets:brand:clean": "tsx src/scripts/generateBrandAssets.ts --clean",
+    "build": "pnpm clean && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "db:init": "tsx src/server/db/init.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.0.3",
+    "@node-rs/argon2": "2.0.2",
+    "better-sqlite3": "12.10.0",
+    "hono": "4.12.19",
+    "lucide-static": "1.16.0",
+    "sanitize-html": "2.17.4",
+    "sharp": "0.34.5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "7.6.13",
+    "@types/node": "24.12.4",
+    "@types/sanitize-html": "2.16.1",
+    "tsx": "4.22.2",
+    "typescript": "6.0.3",
+    "vitest": "4.1.6"
+  }
+}

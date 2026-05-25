@@ -1,0 +1,128 @@
+#cloud-config
+package_update: true
+package_upgrade: false
+
+write_files:
+  - path: /usr/local/sbin/install-bliishspace
+    owner: root:root
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      export DEBIAN_FRONTEND=noninteractive
+
+      apt-get update
+      apt-get install -y ca-certificates curl git sqlite3 build-essential python3 caddy gnupg
+
+      if ! command -v node >/dev/null 2>&1 || ! node --version | grep -q '^v__BLIISH_NODE_MAJOR__\.'; then
+        install -d -m 0755 /etc/apt/keyrings
+        curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor --yes -o /etc/apt/keyrings/nodesource.gpg
+        chmod 0644 /etc/apt/keyrings/nodesource.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node___BLIISH_NODE_MAJOR__.x nodistro main" >/etc/apt/sources.list.d/nodesource.list
+        apt-get update
+        apt-get install -y nodejs
+      fi
+
+      if ! command -v corepack >/dev/null 2>&1; then
+        npm install -g corepack
+      fi
+
+      corepack enable
+
+      if ! id -u bliish >/dev/null 2>&1; then
+        useradd --system --create-home --home-dir /var/lib/bliishspace --shell /usr/sbin/nologin bliish
+      fi
+
+      install -d -o bliish -g bliish /var/lib/bliishspace
+      install -d -o bliish -g bliish /var/lib/bliishspace/uploads
+      install -d -o root -g root /opt
+
+      if [ ! -d /opt/bliishspace/.git ]; then
+        rm -rf /opt/bliishspace
+        git clone "__BLIISH_REPOSITORY_URL__" /opt/bliishspace
+      fi
+
+      git -C /opt/bliishspace fetch --all --tags
+      git -C /opt/bliishspace checkout "__BLIISH_REPOSITORY_REF__"
+      chown -R root:root /opt/bliishspace
+
+      cat >/etc/bliishspace.env <<'ENV'
+      BLIISH_BASE_URL=__BLIISH_BASE_URL__
+      BLIISH_DATABASE_PATH=/var/lib/bliishspace/bliish.sqlite
+      BLIISH_UPLOAD_DIR=/var/lib/bliishspace/uploads
+      BLIISH_ADMIN_USER_ID=__BLIISH_ADMIN_USER_ID__
+      BLIISH_MEDIA_CONCURRENCY=__BLIISH_MEDIA_CONCURRENCY__
+      HOST=127.0.0.1
+      PORT=3000
+      ENV
+
+      chown root:bliish /etc/bliishspace.env
+      chmod 0640 /etc/bliishspace.env
+
+      cd /opt/bliishspace
+      PNPM_PACKAGE_MANAGER="$(node -p "require('./package.json').packageManager || 'pnpm@11.1.3'")"
+      corepack prepare "$PNPM_PACKAGE_MANAGER" --activate
+      pnpm install --frozen-lockfile
+      pnpm build
+
+      runuser -u bliish -- bash -lc 'set -a; . /etc/bliishspace.env; set +a; cd /opt/bliishspace; pnpm db:init'
+
+      cat >/etc/systemd/system/bliishspace.service <<'SERVICE'
+      [Unit]
+      Description=Bliish.space
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=simple
+      User=bliish
+      Group=bliish
+      WorkingDirectory=/opt/bliishspace
+      EnvironmentFile=/etc/bliishspace.env
+      ExecStart=/usr/bin/node /opt/bliishspace/dist/index.js
+      Restart=on-failure
+      RestartSec=5
+      NoNewPrivileges=true
+      PrivateTmp=true
+      PrivateDevices=true
+      ProtectHome=true
+      ProtectSystem=strict
+      ProtectKernelTunables=true
+      ProtectKernelModules=true
+      ProtectControlGroups=true
+      RestrictSUIDSGID=true
+      LockPersonality=true
+      SystemCallArchitectures=native
+      ReadWritePaths=/var/lib/bliishspace
+
+      [Install]
+      WantedBy=multi-user.target
+      SERVICE
+
+      systemctl daemon-reload
+      systemctl enable --now bliishspace
+
+      cat >/etc/caddy/Caddyfile <<'CADDY'
+      {
+        email hi@bliish.com
+      }
+
+      __BLIISH_DOMAIN__ {
+        encode zstd gzip
+        reverse_proxy 127.0.0.1:3000
+      }
+
+      www.__BLIISH_DOMAIN__ {
+        redir https://__BLIISH_DOMAIN__{uri} permanent
+      }
+      CADDY
+
+      caddy validate --config /etc/caddy/Caddyfile
+      systemctl enable --now caddy
+      systemctl reload caddy
+
+runcmd:
+  - [bash, /usr/local/sbin/install-bliishspace]
+
+final_message: "Bliish.space cloud-init finished. Check systemctl status bliishspace and journalctl -u bliishspace."

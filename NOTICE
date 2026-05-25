@@ -1,0 +1,29 @@
+Bliish.space Notice
+===================
+
+Bliish.space is an independent open-source project for self-hosted, profile-first social networking.
+
+Bliish.space is made by Bliish and Bliish.space contributors.
+
+License
+-------
+
+Bliish.space source code is licensed under GPL-3.0-only. See LICENSE.
+
+Project Credits
+---------------
+
+- Bliish, for Bliish.space. https://bliish.com
+- Bliish.space contributors.
+
+Bundled Third-Party Material
+----------------------------
+
+- Lucide Static is used through the `lucide-static` package for interface icons and admin-selected site icons.
+  License: ISC.
+  Source: https://github.com/lucide-icons/lucide
+
+Bundled Project Assets
+----------------------
+
+- `public/static/media/default.mp3` is a silent fallback theme-song file created for this project.
