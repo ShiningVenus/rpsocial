@@ -13,9 +13,10 @@ import {
   unblockUser
 } from "../../server/db/relationships.js";
 import { notifyFriendAccepted } from "../../server/db/notifications/index.js";
-import { listUsers } from "../../server/db/users.js";
+import { listUsersPage } from "../../server/db/users.js";
 import { field } from "../../server/forms.js";
-import { formAction, formId, localBack, queryText, verifiedActionForm } from "../../server/http.js";
+import { formAction, formId, localBack, verifiedActionForm } from "../../server/http.js";
+import { beforeParam, paginationHref } from "../../server/pagination.js";
 import { limits } from "../../policy.js";
 import type { CurrentUser } from "../../currentUser.js";
 import type { AppBindings, AppContext } from "../../server/context.js";
@@ -49,11 +50,15 @@ const blockActions = {
 export function registerPeopleRoutes(app: Hono<AppBindings>) {
   app.get("/browse", (c) => {
     const user = currentUser(c);
+    const before = c.req.query(beforeParam);
+    const page = listUsersPage(user, { before });
     return c.html(
       <PeoplePage
         user={user}
         title="Browse users"
-        people={listUsers(user)}
+        people={page.items}
+        nextHref={page.nextCursor ? paginationHref("/browse", page.nextCursor) : null}
+        resetHref={before ? "/browse" : null}
         seo={{ canonicalPath: "/browse", description: "Browse public profiles from the community." }}
       />
     );

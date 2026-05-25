@@ -5,15 +5,20 @@ import { defaultSocialLinks, normalizeStoredSocialLinks, type SocialLinks } from
 import { normalizeTimeZone } from "../../timeZones.js";
 import { recordFromUnknown, stringFromUnknown } from "../../values.js";
 import { env } from "../env.js";
+import { decodeKeysetCursor, keysetBeforeCondition, normalizePageLimit, pageFromRows, type PageOptions } from "../pagination.js";
 import { ensureDefaultGroupMembership } from "./groups.js";
 import { ensureProtectedAdminFriendship } from "./relationships.js";
 import type { CurrentUser } from "../../currentUser.js";
-import { defaultInterestNames, defaultInterests, defaultStatus, type UserProfile } from "../../models.js";
+import { defaultInterestNames, defaultInterests, defaultStatus, type PersonCard, type UserProfile } from "../../models.js";
 import { profileVisibilitySql } from "./profileVisibility.js";
 import { containsLikePattern, likeEscapeClause } from "./like.js";
 import { personCardRows } from "./personCards.js";
 
 const currentUserColumns = "id, username, email, role, time_zone AS timeZone, verified_at AS verifiedAt, banned_at AS bannedAt";
+
+type PagedPersonCardRow = PersonCard & {
+  createdAt: string;
+};
 
 export class HandleReservedError extends Error {
   constructor(readonly reason: "reserved" | "taken" = "taken") {
@@ -212,10 +217,26 @@ export function listUsers(viewer: CurrentUser | null = null, limit = limits.list
   const visible = profileVisibilitySql(viewer);
   return personCardRows(
     `FROM users u JOIN profiles p ON p.user_id = u.id
-    WHERE ${visible.sql} ORDER BY u.created_at DESC LIMIT ?`,
+    WHERE ${visible.sql} ORDER BY u.created_at DESC, u.id DESC LIMIT ?`,
     ...visible.params,
     limit
   );
+}
+
+export function listUsersPage(viewer: CurrentUser | null = null, options: PageOptions = {}) {
+  const limit = normalizePageLimit(options.limit, limits.listPage, limits.listPage);
+  const visible = profileVisibilitySql(viewer);
+  const before = keysetBeforeCondition(decodeKeysetCursor(options.before), "u.created_at", "u.id");
+  const rows = sqlite
+    .prepare(
+      `SELECT u.id, u.username, p.handle, p.pfp, u.created_at AS createdAt
+      FROM users u JOIN profiles p ON p.user_id = u.id
+      WHERE ${visible.sql}
+      ${before.sql}
+      ORDER BY u.created_at DESC, u.id DESC LIMIT ?`
+    )
+    .all(...visible.params, ...before.params, limit + 1) as PagedPersonCardRow[];
+  return pageFromRows(rows, limit);
 }
 
 export function deleteAccount(userId: number) {

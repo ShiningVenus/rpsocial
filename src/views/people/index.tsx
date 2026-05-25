@@ -2,14 +2,23 @@ import type { PersonCard } from "../../models.js";
 import type { CurrentUser } from "../../currentUser.js";
 import { ActionLabel } from "../../ui/actions.js";
 import { CsrfInput } from "../../ui/forms.js";
+import { PaginationNav } from "../../ui/pagination.js";
 import { PeopleBox, PersonActionCard } from "../../ui/people.js";
 import { Layout, PageFrame, type PageSeo } from "../../shell/index.js";
 
-export function PeoplePage(props: { user: CurrentUser | null; title: string; people: PersonCard[]; seo?: PageSeo }) {
+export function PeoplePage(props: {
+  user: CurrentUser | null;
+  title: string;
+  people: PersonCard[];
+  nextHref?: string | null;
+  resetHref?: string | null;
+  seo?: PageSeo;
+}) {
   return (
     <Layout title={props.title} user={props.user} seo={props.seo}>
       <PageFrame title={props.title}>
         <PeopleBox title={props.title} people={props.people} />
+        <PaginationNav nextHref={props.nextHref} nextLabel="Older users" resetHref={props.resetHref} resetLabel="Newest users" />
       </PageFrame>
     </Layout>
   );

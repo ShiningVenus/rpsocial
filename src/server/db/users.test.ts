@@ -46,6 +46,29 @@ describe("users", () => {
     expect(users.getProfile(bannedId)?.bannedAt).toBeTruthy();
   });
 
+  it("paginates profile discovery in newest-first order", async () => {
+    const { users } = await loadIsolatedDb();
+    const createdIds = ["one", "two", "three", "four", "five"].map((handle) =>
+      users.createUser({
+        username: handle,
+        email: `${handle}@example.test`,
+        handle,
+        passwordHash: "hash"
+      })
+    );
+
+    const firstPage = users.listUsersPage(null, { limit: 2 });
+    const secondPage = users.listUsersPage(null, { before: firstPage.nextCursor, limit: 2 });
+    const thirdPage = users.listUsersPage(null, { before: secondPage.nextCursor, limit: 2 });
+
+    expect(firstPage.items.map((person) => person.id)).toEqual([createdIds[4], createdIds[3]]);
+    expect(firstPage.nextCursor).toBeTruthy();
+    expect(secondPage.items.map((person) => person.id)).toEqual([createdIds[2], createdIds[1]]);
+    expect(secondPage.nextCursor).toBeTruthy();
+    expect(thirdPage.items.map((person) => person.id)).toEqual([createdIds[0]]);
+    expect(thirdPage.nextCursor).toBeNull();
+  });
+
   it("rejects reserved profile handles", async () => {
     const { users } = await loadIsolatedDb();
     users.createUser({ username: "Active", email: "active@example.test", handle: "active", passwordHash: "hash" });
